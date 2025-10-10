@@ -1,821 +1,2152 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ระบบรับสมัครคณะกรรมการนักเรียนขับเคลื่อนโรงเรียนคุณธรรม • โรงเรียนสตรีพัทลุง</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Noto Sans Thai', 'ui-sans-serif', 'system-ui'] },
-          colors: {
-            primary: {50:'#eef9fb',100:'#d6f1f7',200:'#b0e3ee',300:'#83cfe0',400:'#54b6ce',500:'#359db7',600:'#2a7f98',700:'#25687d',800:'#235767',900:'#1f4957'}
-          },
-          boxShadow: { glow: '0 10px 30px rgba(53,157,183,0.25)' }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPT MORAL SCHOOL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <style>
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-      }
-    }
-  </script>
-  <style>
-    body{ background:#ffffff; }
-    .tab-btn{ color:#111827; }
-    .tab-active{ background:#f3f4f6; border:1px solid #d1d5db; color:#111827; box-shadow:0 6px 14px rgba(0,0,0,.08); }
-    .input{ background:#ffffff; border:1px solid #d1d5db; transition:all .2s; }
-    .input:focus{ border-color:#54b6ce; box-shadow:0 0 0 4px rgba(83,207,224,.15); outline:none; }
-    .btn{ box-shadow:0 6px 14px rgba(0,0,0,.08); transition:transform .05s, box-shadow .2s, background .2s, opacity .2s; }
-    .btn:hover{ box-shadow:0 12px 24px rgba(0,0,0,.12); }
-    .btn:active{ transform:translateY(1px); }
-    .table-wrap{ overflow:auto; }
-  </style>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        .bg-pattern {
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+        }
+    </style>
 </head>
-<body class="font-sans text-gray-900">
-  <div class="max-w-6xl mx-auto px-4 py-8 md:py-12">
-    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-      <div class="flex items-center gap-4">
-        <div class="w-16 h-16 rounded-2xl overflow-hidden ring-2 ring-black/5 shadow-glow flex items-center justify-center bg-white">
-          <img src="https://img5.pic.in.th/file/secure-sv1/IMG_25650953161d1c1bbdd8.jpeg"
-               alt="โลโก้โรงเรียนสตรีพัทลุง"
-               class="w-full h-full object-cover"
-               onerror="this.src=''; this.alt='Image failed to load'; this.style.display='none';">
-        </div>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-bold leading-tight">ระบบรับสมัครคณะกรรมการนักเรียนขับเคลื่อนโรงเรียนคุณธรรม สพฐ.</h1>
-          <p class="text-gray-500">โรงเรียนสตรีพัทลุง • STUDENTS MORALITY LEADERSHIP COMMITTEE</p>
-        </div>
-      </div>
-      <div class="flex gap-2 items-center">
-        <span class="px-3 py-1 rounded-full text-sm bg-green-50 text-green-700 ring-1 ring-green-200">รุ่นใช้งานจริง</span>
-      </div>
-    </header>
-
-    <nav class="mt-8 bg-white ring-1 ring-black/10 rounded-2xl p-2 flex flex-wrap gap-2 shadow-lg">
-      <button type="button" data-tab="apply" class="tab-btn tab-active px-5 py-3 rounded-xl btn hover:bg-gray-100">หน้ารับสมัคร</button>
-      <button type="button" data-tab="dashboard" class="tab-btn px-5 py-3 rounded-xl btn hover:bg-gray-100">ตรวจสอบการสมัคร</button>
-      <button type="button" data-tab="admin" class="tab-btn px-5 py-3 rounded-xl btn hover:bg-gray-100">ผู้ดูแล</button>
-    </nav>
-
-    <section id="tab-apply" class="mt-6 rounded-2xl p-6 md:p-8 bg-white ring-1 ring-black/10 shadow-lg">
-      <div class="flex items-start gap-4 justify-between flex-wrap">
-        <div>
-          <h2 class="text-xl md:text-2xl font-semibold">แบบฟอร์มสมัครคณะกรรมการนักเรียนขับเคลื่อนโรงเรียนคุณธรรม</h2>
-          <p class="text-gray-600">กรอกข้อมูลให้ครบถ้วน แล้วกดส่งสมัคร</p>
-        </div>
-
-      </div>
-
-      <form id="applyForm" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4" autocomplete="off">
-        <div>
-          <label class="block mb-2">ระดับชั้น</label>
-          <select id="grade" class="w-full input rounded-xl px-4 py-3" required>
-            <option value="">— เลือกระดับชั้น —</option>
-            <option>ม.1</option><option>ม.2</option><option>ม.3</option>
-            <option>ม.4</option><option>ม.5</option><option>ม.6</option>
-          </select>
-        </div>
-        <div>
-          <label class="block mb-2">ห้อง</label>
-          <select id="room" class="w-full input rounded-xl px-4 py-3" required></select>
-        </div>
-        <div>
-          <label class="block mb-2">คำนำหน้าชื่อ</label>
-          <select id="prefix" class="w-full input rounded-xl px-4 py-3" required>
-            <option value="">— เลือกคำนำหน้า —</option>
-            <option>เด็กชาย</option><option>เด็กหญิง</option><option>นาย</option><option>นางสาว</option>
-          </select>
-        </div>
-        <div>
-          <label class="block mb-2">ชื่อ</label>
-          <input id="firstName" class="w-full input rounded-xl px-4 py-3" placeholder="เช่น กิตติ" required />
-        </div>
-        <div>
-          <label class="block mb-2">นามสกุล</label>
-          <input id="lastName" class="w-full input rounded-xl px-4 py-3" placeholder="เช่น สุขใจ" required />
-        </div>
-        <div>
-          <label class="block mb-2">ชื่อเล่น</label>
-          <input id="nickname" class="w-full input rounded-xl px-4 py-3" placeholder="เช่น โฟกัส" required />
-        </div>
-        <div>
-          <label class="block mb-2">เลขประจำตัวนักเรียน</label>
-          <input id="studentId" class="w-full input rounded-xl px-4 py-3" placeholder="เช่น 12345" pattern="^[0-9]{5}$" maxlength="5" required />
-          <p class="text-gray-500 text-sm mt-2">กรอกตัวเลข 5 หลัก</p>
-        </div>
-        <div>
-          <label class="block mb-2">หมายเลขโทรศัพท์</label>
-          <input id="phone" type="tel" class="w-full input rounded-xl px-4 py-3" placeholder="เช่น 08xxxxxxxx" pattern="^[0-9]{9,10}$" required />
-          <p class="text-gray-500 text-sm mt-2">กรอกตัวเลข 9–10 หลัก</p>
-        </div>
-        <div class="md:col-span-2 flex items-center justify-between mt-2">
-          <div class="text-gray-600 text-sm">ข้อมูลของคุณจะถูกบันทึกลงฐานข้อมูลอย่างปลอดภัย</div>
-          <button id="submitBtn" class="btn bg-primary-600 hover:bg-primary-500 active:bg-primary-700 text-white px-6 py-3 rounded-xl shadow-glow flex items-center gap-2">
-            <span>ส่งข้อมูลสมัคร</span>
-          </button>
-        </div>
-      </form>
-      <div id="applyMessage" class="mt-4 hidden"></div>
-    </section>
-
-    <section id="tab-dashboard" class="mt-6 rounded-2xl p-6 md:p-8 hidden bg-white ring-1 ring-black/10 shadow-lg">
-      <div class="flex items-start gap-4 justify-between flex-wrap">
-        <div>
-          <h2 class="text-xl md:text-2xl font-semibold">ตรวจสอบการสมัคร</h2>
-          <p class="text-gray-600">กรอกเลขประจำตัวนักเรียนเพื่อตรวจสอบสถานะการสมัคร</p>
-        </div>
-        <div class="px-3 py-2 rounded-xl text-sm bg-primary-50 text-primary-800 ring-1 ring-primary-200">ค้นหาได้ทันที</div>
-      </div>
-
-      <div class="mt-6 max-w-md">
-        <label class="block mb-2">เลขประจำตัวนักเรียน</label>
-        <div class="flex gap-3">
-          <input id="checkStudentId" class="flex-1 input rounded-xl px-4 py-3" placeholder="กรอกเลขประจำตัว 5 หลัก" pattern="^[0-9]{5}$" maxlength="5" />
-          <button id="checkBtn" class="btn bg-primary-600 hover:bg-primary-500 text-white px-6 py-3 rounded-xl">ค้นหา</button>
-        </div>
-        <p class="text-gray-500 text-sm mt-2">กรอกตัวเลข 5 หลัก แล้วกดค้นหา</p>
-      </div>
-
-      <div id="checkResult" class="mt-6 hidden">
-        </div>
-    </section>
-
-    <section id="tab-admin" class="mt-6 rounded-2xl p-6 md:p-8 hidden bg-white ring-1 ring-black/10 shadow-lg">
-      <div class="flex items-start gap-4 justify-between flex-wrap">
-        <div>
-          <h2 class="text-xl md:text-2xl font-semibold">ผู้ดูแลระบบ</h2>
-          <p class="text-gray-600">เข้าสู่ระบบเพื่อจัดการข้อมูล</p>
-        </div>
-        <div class="px-3 py-2 rounded-xl text-sm ring-1 ring-dashed ring-black/10">เฉพาะผู้ดูแล</div>
-      </div>
-
-      <div id="adminLogin" class="mt-6">
-        <div class="rounded-2xl bg-white text-gray-800 p-6 ring-1 ring-black/10 shadow-lg max-w-md">
-          <h3 class="text-lg font-semibold">เข้าสู่ระบบผู้ดูแล</h3>
-          <form id="loginForm" class="mt-4 grid gap-3" autocomplete="off">
-            <div>
-              <label class="block mb-1 text-sm">อีเมล</label>
-              <input id="loginEmail" type="email" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400" placeholder="name@domain.com" required />
-            </div>
-            <div>
-              <label class="block mb-1 text-sm">รหัสผ่าน</label>
-              <input id="loginPassword" type="password" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-400" placeholder="รหัสผ่าน" required />
-            </div>
-            <button id="loginBtn" class="btn rounded-xl bg-primary-600 hover:bg-primary-500 text-white px-5 py-3">เข้าสู่ระบบ</button>
-            <div id="loginMsg" class="text-sm text-red-600 mt-1 hidden"></div>
-          </form>
-        </div>
-      </div>
-
-      <div id="adminPanel" class="mt-6 hidden">
-        <div class="flex items-center justify-between">
-          <div class="text-gray-700" id="adminStatus">กำลังตรวจสอบสิทธิ์...</div>
-          <button id="logoutBtn" class="btn bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-xl">ออกจากระบบ</button>
-        </div>
-
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label class="block mb-2">ค้นหาตามระดับชั้น</label>
-            <select id="adminGrade" class="w-full input rounded-xl px-4 py-3">
-              <option value="">ทั้งหมด</option>
-              <option>ม.1</option><option>ม.2</option><option>ม.3</option>
-              <option>ม.4</option><option>ม.5</option><option>ม.6</option>
-            </select>
-          </div>
-          <div>
-            <label class="block mb-2">ค้นหาตามห้อง</label>
-            <select id="adminRoom" class="w-full input rounded-xl px-4 py-3" disabled>
-              <option value="">ทั้งหมด</option>
-            </select>
-          </div>
-          <div class="flex items-end gap-2">
-            <button id="exportBtn" class="btn w-full bg-primary-50 hover:bg-primary-100 text-primary-800 px-4 py-3 rounded-xl ring-1 ring-primary-200">ส่งออก CSV (ตามตัวกรอง)</button>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap gap-2 mt-4">
-          <button id="loadAllBtn" class="btn bg-primary-600 hover:bg-primary-500 text-white px-4 py-2 rounded-xl">โหลดข้อมูลทั้งหมด</button>
-          <button id="clearAllBtn" class="btn bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-xl">ล้างข้อมูลทั้งหมด</button>
-          <button id="exportAllBtn" class="btn bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl">ส่งออก CSV (ทั้งหมด)</button>
-        </div>
-
-        <div class="table-wrap mt-6">
-          <table class="min-w-full text-left">
-            <thead class="text-gray-700">
-              <tr>
-                <th class="py-3 pr-4">ชั้น</th>
-                <th class="py-3 pr-4">ห้อง</th>
-                <th class="py-3 pr-4">คำนำหน้า</th>
-                <th class="py-3 pr-4">ชื่อ</th>
-                <th class="py-3 pr-4">นามสกุล</th>
-                <th class="py-3 pr-4">ชื่อเล่น</th>
-                <th class="py-3 pr-4">เลขประจำตัว</th>
-                <th class="py-3 pr-4">โทรศัพท์</th>
-                <th class="py-3 pr-4">เวลา</th>
-                <th class="py-3 pr-4">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="adminList" class="divide-y divide-gray-200"></tbody>
-          </table>
-        </div>
-        <div id="adminEmpty" class="mt-6 text-gray-600">ยังไม่มีข้อมูลแสดง</div>
-      </div>
-    </section>
-
-    <footer class="mt-10 text-center">
-      <div class="mx-auto max-w-6xl">
-        <div class="rounded-2xl bg-white shadow-lg ring-1 ring-black/5 px-4 py-4 text-gray-700">
-          <div class="text-sm text-center">copyright 2024 SPT MORAL SCHOOL - โรงเรียนคุณธรรม สพฐ. โรงเรียนสตรีพัทลุง</div>
-        </div>
-      </div>
-    </footer>
-  </div>
-
-  <div id="editModal" class="fixed inset-0 hidden z-50 items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/60"></div>
-    <div class="relative bg-white w-full max-w-2xl rounded-2xl p-6 ring-1 ring-black/10">
-      <div class="flex items-center justify-between">
-        <h3 class="text-xl font-semibold">แก้ไขข้อมูลผู้สมัคร</h3>
-        <button id="closeEditModal" class="btn px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">ปิด</button>
-      </div>
-      <form id="editForm" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="hidden" id="editId" />
-        <div>
-          <label class="block mb-2">ระดับชั้น</label>
-          <select id="editGrade" class="w-full input rounded-xl px-4 py-3" required>
-            <option>ม.1</option><option>ม.2</option><option>ม.3</option>
-            <option>ม.4</option><option>ม.5</option><option>ม.6</option>
-          </select>
-        </div>
-        <div>
-          <label class="block mb-2">ห้อง</label>
-          <select id="editRoom" class="w-full input rounded-xl px-4 py-3" required></select>
-        </div>
-        <div>
-          <label class="block mb-2">คำนำหน้า</label>
-          <select id="editPrefix" class="w-full input rounded-xl px-4 py-3" required>
-            <option>เด็กชาย</option><option>เด็กหญิง</option><option>นาย</option><option>นางสาว</option>
-          </select>
-        </div>
-        <div>
-          <label class="block mb-2">ชื่อ</label>
-          <input id="editFirstName" class="w-full input rounded-xl px-4 py-3" required />
-        </div>
-        <div>
-          <label class="block mb-2">นามสกุล</label>
-          <input id="editLastName" class="w-full input rounded-xl px-4 py-3" required />
-        </div>
-        <div>
-          <label class="block mb-2">ชื่อเล่น</label>
-          <input id="editNickname" class="w-full input rounded-xl px-4 py-3" required />
-        </div>
-        <div>
-          <label class="block mb-2">เลขประจำตัวนักเรียน</label>
-          <input id="editStudentId" class="w-full input rounded-xl px-4 py-3" pattern="^[0-9]{5}$" maxlength="5" required />
-        </div>
-        <div>
-          <label class="block mb-2">โทรศัพท์</label>
-          <input id="editPhone" class="w-full input rounded-xl px-4 py-3" pattern="^[0-9]{9,10}$" required />
-        </div>
-
-        <div class="md:col-span-2 flex justify-end gap-2 mt-2">
-          <button type="button" id="cancelEdit" class="btn px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">ยกเลิก</button>
-          <button type="submit" class="btn px-5 py-2 rounded-xl bg-primary-600 hover:bg-primary-500 text-white">บันทึกการแก้ไข</button>
-        </div>
-      </form>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 bg-pattern">
+    <!-- Background Logo -->
+    <div class="fixed inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+        <img src="https://img5.pic.in.th/file/secure-sv1/IMG_25650953161d1c1bbdd8.jpeg" alt="โลโก้โรงเรียน" class="w-96 h-96 object-contain">
     </div>
-  </div>
 
-  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden">
-    <div class="rounded-xl px-4 py-3 shadow-glow text-sm bg-white ring-1 ring-black/10" id="toastText">บันทึกสำเร็จ</div>
-  </div>
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+        <div class="glass-effect rounded-3xl shadow-2xl p-8 w-full max-w-md hover-lift">
+            <div class="text-center mb-8">
+                <img src="https://img5.pic.in.th/file/secure-sv1/IMG_25650953161d1c1bbdd8.jpeg" alt="โลโก้โรงเรียน" class="w-20 h-20 mx-auto mb-4 rounded-full shadow-lg">
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">SPT MORAL SCHOOL</h1>
+                <p class="text-gray-600">โรงเรียนคุณธรรม สพฐ. โรงเรียนสตรีพัทลุง</p>
+            </div>
 
-  <script>
-    // Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyD79K8gL79dTFkomWpkmNZjQ8Z9PRksAoU",
-      authDomain: "spt-smlc-regis.firebaseapp.com",
-      projectId: "spt-smlc-regis",
-      storageBucket: "spt-smlc-regis.firebasestorage.app",
-      messagingSenderId: "619194645473",
-      appId: "1:619194645473:web:2960f189b7ae7ba37c30a0",
-      measurementId: "G-2X33GPBS0W"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const auth = firebase.auth();
-    const COL = 'applications';
+            <div id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">อีเมล</label>
+                    <input type="email" id="loginEmail" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">รหัสผ่าน</label>
+                    <input type="password" id="loginPassword" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+                <button onclick="login()" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition-all hover-lift font-medium">เข้าสู่ระบบ</button>
+                <p class="text-center mt-4 text-gray-600">ยังไม่มีบัญชี? <button onclick="showRegister()" class="text-blue-600 hover:underline">สมัครสมาชิก</button></p>
+            </div>
 
-    const ADMIN_EMAILS = ['sptmorral@spt.ac.th'];
+            <div id="registerForm" class="hidden">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">ชื่อ-นามสกุล</label>
+                    <input type="text" id="registerName" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">อีเมล</label>
+                    <input type="email" id="registerEmail" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">รหัสผ่าน</label>
+                    <input type="password" id="registerPassword" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+                <button onclick="register()" class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition-all hover-lift font-medium">สมัครสมาชิก</button>
+                <p class="text-center mt-4 text-gray-600">มีบัญชีแล้ว? <button onclick="showLogin()" class="text-blue-600 hover:underline">เข้าสู่ระบบ</button></p>
+                <div class="mt-4 p-3 bg-yellow-100 rounded-xl text-sm text-yellow-800">
+                    <p>หมายเหตุ: การสมัครสมาชิกต้องได้รับการอนุมัติจากผู้ดูแลระบบก่อน</p>
+                </div>
+            </div>
+            
 
-    // Helpers
-    const qs = (s, r=document) => r.querySelector(s);
-    const qsa = (s, r=document) => [...r.querySelectorAll(s)];
-    const show = el => el.classList.remove('hidden');
-    const hide = el => el.classList.add('hidden');
-    const setText = (el, t) => { if(el) el.textContent = t; };
-    const toast = (msg) => {
-      const box = qs('#toast'), text = qs('#toastText');
-      if (!box || !text) return;
-      text.textContent = msg; show(box);
-      clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(()=>hide(box), 2200);
-    };
+        </div>
+    </div>
 
-    // Tabs - Fixed version
-    window.switchTab = function(tab){
-      const target = tab || 'apply';
-      console.log('Switching to tab:', target);
-      
-      // Remove active class from all tabs
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('tab-active'));
-      
-      // Hide all tab content
-      document.querySelectorAll('[id^="tab-"]').forEach(s=>s.classList.add('hidden'));
-      
-      // Add active class to clicked tab
-      const btn = document.querySelector(`[data-tab="${target}"]`);
-      if (btn) {
-        btn.classList.add('tab-active');
-        console.log('Tab button found and activated:', target);
-      }
-      
-      // Show target tab content
-      const pane = document.querySelector(`#tab-${target}`);
-      if (pane) {
-        pane.classList.remove('hidden');
-        console.log('Tab content shown:', target);
-      }
-      
-      try { history.replaceState(null, '', `#${target}`); } catch(_){}
-    }
-    
-    function initTabs(){
-      console.log('Initializing tabs...');
-      // Ensure listeners are only added once
-      if (!window.__tabsInitialized) {
-        document.querySelectorAll('.tab-btn').forEach((b)=>{
-          console.log('Adding listener to tab:', b.dataset.tab);
-          b.addEventListener('click', (e)=>{ 
-            e.preventDefault(); 
-            e.stopPropagation();
-            console.log('Tab clicked:', b.dataset.tab);
-            window.switchTab(b.dataset.tab); 
-          });
-        });
-        window.__tabsInitialized = true;
-      }
-      
-      const initial = (location.hash || '#apply').replace('#','');
-      console.log('Initial tab:', initial);
-      window.switchTab(initial);
-      
-      window.addEventListener('hashchange', ()=> {
-        const newTab = (location.hash||'#apply').replace('#','');
-        console.log('Hash changed to:', newTab);
-        window.switchTab(newTab);
-      });
-    }
-    
-    // Initialize tabs immediately
-    document.addEventListener('DOMContentLoaded', initTabs);
-    if (document.readyState !== 'loading') {
-      initTabs();
-    }
+    <!-- Main App -->
+    <div id="mainApp" class="hidden">
+        <!-- Navigation -->
+        <nav class="glass-effect shadow-lg sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://img5.pic.in.th/file/secure-sv1/IMG_25650953161d1c1bbdd8.jpeg" alt="โลโก้โรงเรียน" class="w-10 h-10 rounded-full">
+                        <h1 class="text-xl font-bold text-gray-800">SPT MORAL SCHOOL</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="userInfo" class="text-gray-600"></span>
+                        <button onclick="showChangePassword()" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all hover-lift">แก้ไขรหัสผ่าน</button>
+                        <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all hover-lift">ออกจากระบบ</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
 
-    // Rooms 1–12
-    function fillRooms(selectEl, includeAll=false){
-      selectEl.innerHTML = '';
-      const first = document.createElement('option');
-      first.value = ''; 
-      first.textContent = includeAll ? 'ทั้งหมด' : '— เลือกห้อง —';
-      selectEl.appendChild(first);
-      for (let i=1;i<=12;i++){
-        const o = document.createElement('option');
-        o.value = String(i); 
-        o.textContent = String(i);
-        selectEl.appendChild(o);
-      }
-    }
-    
-    // Initialize room functionality for the main application form
-    function initializeRoomSelect() {
-      const roomSelect = document.querySelector('#room');
-      const editRoomSelect = document.querySelector('#editRoom');
-      
-      if (roomSelect) {
-        console.log('Initializing application room select...');
-        fillRooms(roomSelect, false);
-        roomSelect.disabled = false;
-      }
+        <!-- Menu Tabs -->
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="glass-effect rounded-2xl p-2 mb-6">
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="showPage('home')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="home">หน้าหลัก</button>
+                    <button onclick="showPage('activities')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="activities">กิจกรรม</button>
+                    <button onclick="showPage('linegroups')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="linegroups">กลุ่มไลน์</button>
+                    <button onclick="showPage('equipment')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="equipment">ยืม-คืนอุปกรณ์</button>
+                    <button onclick="showPage('calendar')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="calendar">ปฏิทิน</button>
+                    <button id="adminBtn" onclick="showPage('admin')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift hidden" data-page="admin">จัดการระบบ</button>
+                </div>
+            </div>
 
-      if (editRoomSelect) {
-         // fillRooms for edit modal is called when openEditModal is executed
-         console.log('Edit room select placeholder initialized.');
-      }
+            <!-- Home Page -->
+            <div id="homePage" class="page">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- Activities Summary -->
+                    <div class="glass-effect rounded-xl p-4 hover-lift">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">กิจกรรมทั้งหมด</p>
+                                <p class="text-2xl font-bold text-blue-600" id="totalActivities">0</p>
+                            </div>
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
-      // Also ensure adminRoom is set up correctly initially
-      const adminRoom = qs('#adminRoom');
-      if (adminRoom) {
-        adminRoom.innerHTML = '<option value="">ทั้งหมด</option>';
-        adminRoom.disabled = true;
-      }
-    }
-    
-    // Initialize room select immediately
-    document.addEventListener('DOMContentLoaded', initializeRoomSelect);
-    if (document.readyState !== 'loading') {
-      initializeRoomSelect();
-    }
-    
-    const adminRoom = qs('#adminRoom');
-    qs('#adminGrade').addEventListener('change', (e)=>{
-      const val = e.target.value;
-      if (!val){ adminRoom.innerHTML = '<option value="">ทั้งหมด</option>'; adminRoom.disabled = true; return; }
-      fillRooms(adminRoom, true); adminRoom.disabled = false;
-      // auto reload when filters change (if admin)
-      if (window.__isAdmin) attachAdminListener();
-    });
+                    <!-- Line Groups Summary -->
+                    <div class="glass-effect rounded-xl p-4 hover-lift">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">กลุ่มไลน์</p>
+                                <p class="text-2xl font-bold text-green-600" id="totalLineGroups">0</p>
+                            </div>
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
-    // Apply form
-    qs('#applyForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const submitBtn = qs('#submitBtn');
-      submitBtn.disabled = true; submitBtn.classList.add('opacity-70');
+                    <!-- Equipment Summary -->
+                    <div class="glass-effect rounded-xl p-4 hover-lift">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">อุปกรณ์ทั้งหมด</p>
+                                <p class="text-2xl font-bold text-purple-600" id="totalEquipment">0</p>
+                            </div>
+                            <div class="bg-purple-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
-      const grade = qs('#grade').value.trim();
-      const room = qs('#room').value.trim();
-      const prefix = qs('#prefix').value.trim();
-      const firstName = qs('#firstName').value.trim();
-      const lastName = qs('#lastName').value.trim();
-      const nickname = qs('#nickname').value.trim();
-      const studentId = qs('#studentId').value.trim();
-      const phone = qs('#phone').value.trim();
-      const msg = qs('#applyMessage'); hide(msg); msg.className='mt-4 hidden';
+                    <!-- Calendar Events Summary -->
+                    <div class="glass-effect rounded-xl p-4 hover-lift">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">กิจกรรมในปฏิทิน</p>
+                                <p class="text-2xl font-bold text-orange-600" id="totalCalendarEvents">0</p>
+                            </div>
+                            <div class="bg-orange-100 p-3 rounded-full">
+                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-      if(!grade || !room || !prefix || !firstName || !lastName || !nickname || !studentId || !phone){
-        submitBtn.disabled=false; submitBtn.classList.remove('opacity-70');
-        showError('กรุณากรอกข้อมูลให้ครบถ้วน'); return;
-      }
-      if(!/^[0-9]{5}$/.test(studentId)){
-        submitBtn.disabled=false; submitBtn.classList.remove('opacity-70');
-        showError('เลขประจำตัวนักเรียนต้องเป็นตัวเลข 5 หลัก'); return;
-      }
-      if(!/^[0-9]{9,10}$/.test(phone)){
-        submitBtn.disabled=false; submitBtn.classList.remove('opacity-70');
-        showError('เบอร์โทรต้องเป็นตัวเลข 9–10 หลัก'); return;
-      }
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Calendar Widget -->
+                    <div class="glass-effect rounded-2xl p-6 hover-lift">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">ปฏิทินกิจกรรม</h2>
+                        <div id="homeCalendar" class="bg-white rounded-xl p-4">
+                            <div class="text-center mb-4">
+                                <h3 class="text-lg font-semibold" id="currentMonth"></h3>
+                            </div>
+                            <div class="grid grid-cols-7 gap-1 text-center text-sm">
+                                <div class="font-semibold p-2">อา</div>
+                                <div class="font-semibold p-2">จ</div>
+                                <div class="font-semibold p-2">อ</div>
+                                <div class="font-semibold p-2">พ</div>
+                                <div class="font-semibold p-2">พฤ</div>
+                                <div class="font-semibold p-2">ศ</div>
+                                <div class="font-semibold p-2">ส</div>
+                            </div>
+                            <div id="calendarDays" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+                        </div>
+                    </div>
 
-      try {
-        // Check if student ID already exists
-        const existingSnap = await db.collection(COL).where('studentId','==',studentId).get();
-        if (!existingSnap.empty) {
-          submitBtn.disabled=false; submitBtn.classList.remove('opacity-70');
-          showError('เลขประจำตัวนักเรียนนี้ได้สมัครไปแล้ว'); return;
+                    <!-- Recent Activities & Equipment Status -->
+                    <div class="space-y-6">
+                        <!-- Recent Activities -->
+                        <div class="glass-effect rounded-2xl p-6 hover-lift">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-bold text-gray-800">กิจกรรมล่าสุด</h2>
+                                <button onclick="showPage('activities')" class="text-blue-600 hover:text-blue-800 text-sm">ดูทั้งหมด →</button>
+                            </div>
+                            <div id="recentActivities" class="space-y-3">
+                                <p class="text-gray-600">ไม่มีกิจกรรม</p>
+                            </div>
+                        </div>
+
+                        <!-- Equipment Status -->
+                        <div class="glass-effect rounded-2xl p-6 hover-lift">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-bold text-gray-800">สถานะอุปกรณ์</h2>
+                                <button onclick="showPage('equipment')" class="text-purple-600 hover:text-purple-800 text-sm">ดูทั้งหมด →</button>
+                            </div>
+                            <div id="equipmentStatus" class="space-y-3">
+                                <p class="text-gray-600">ไม่มีข้อมูลอุปกรณ์</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Line Groups & Calendar Events -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                    <!-- Recent Line Groups -->
+                    <div class="glass-effect rounded-2xl p-6 hover-lift">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold text-gray-800">กลุ่มไลน์ล่าสุด</h2>
+                            <button onclick="showPage('linegroups')" class="text-green-600 hover:text-green-800 text-sm">ดูทั้งหมด →</button>
+                        </div>
+                        <div id="recentLineGroups" class="space-y-3">
+                            <p class="text-gray-600">ไม่มีกลุ่มไลน์</p>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Calendar Events -->
+                    <div class="glass-effect rounded-2xl p-6 hover-lift">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold text-gray-800">กิจกรรมที่จะมาถึง</h2>
+                            <button onclick="showPage('calendar')" class="text-orange-600 hover:text-orange-800 text-sm">ดูทั้งหมด →</button>
+                        </div>
+                        <div id="upcomingEvents" class="space-y-3">
+                            <p class="text-gray-600">ไม่มีกิจกรรมที่จะมาถึง</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activities Page -->
+            <div id="activitiesPage" class="page hidden">
+                <div class="glass-effect rounded-2xl p-6 hover-lift">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">กิจกรรม</h2>
+                        <button onclick="showAddActivity()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all hover-lift">เพิ่มกิจกรรม</button>
+                    </div>
+                    
+                    <div id="addActivityForm" class="hidden mb-6 p-4 bg-blue-50 rounded-xl">
+                        <h3 class="font-semibold mb-4">เพิ่มกิจกรรมใหม่</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="activityName" placeholder="ชื่อกิจกรรม" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="date" id="activityDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="time" id="activityTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" id="activityLocation" placeholder="สถานที่" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <textarea id="activityDetails" placeholder="รายละเอียดกิจกรรม" class="w-full mt-4 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="submitActivity()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">ส่งคำขอ</button>
+                            <button onclick="hideAddActivity()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">ยกเลิก</button>
+                        </div>
+                    </div>
+
+                    <div id="activitiesList" class="space-y-4">
+                        <p class="text-gray-600">ยังไม่มีกิจกรรม</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Line Groups Page -->
+            <div id="linegroupsPage" class="page hidden">
+                <div class="glass-effect rounded-2xl p-6 hover-lift">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">กลุ่มไลน์</h2>
+                        <button id="addLineGroupBtn" onclick="showAddLineGroup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all hover-lift hidden">เพิ่มกลุ่มไลน์</button>
+                    </div>
+
+                    <div id="addLineGroupForm" class="hidden mb-6 p-4 bg-green-50 rounded-xl">
+                        <h3 class="font-semibold mb-4">เพิ่มกลุ่มไลน์ใหม่</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="lineGroupName" placeholder="ชื่อกลุ่ม" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <input type="url" id="lineGroupLink" placeholder="ลิงก์กลุ่มไลน์" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="addLineGroup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">เพิ่มกลุ่ม</button>
+                            <button onclick="hideAddLineGroup()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">ยกเลิก</button>
+                        </div>
+                    </div>
+
+                    <div id="lineGroupsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <p class="text-gray-600">ยังไม่มีกลุ่มไลน์</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment Page -->
+            <div id="equipmentPage" class="page hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Borrow Equipment -->
+                    <div class="glass-effect rounded-2xl p-6 hover-lift">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">ยืมอุปกรณ์</h2>
+                        <div id="availableEquipment" class="space-y-3">
+                            <p class="text-gray-600">ไม่มีอุปกรณ์ให้ยืม</p>
+                        </div>
+                    </div>
+
+                    <!-- My Borrowed Equipment -->
+                    <div class="glass-effect rounded-2xl p-6 hover-lift">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">อุปกรณ์ที่ยืม</h2>
+                        <div id="myBorrowedEquipment" class="space-y-3">
+                            <p class="text-gray-600">ไม่มีอุปกรณ์ที่ยืม</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Page -->
+            <div id="calendarPage" class="page hidden">
+                <div class="glass-effect rounded-2xl p-6 hover-lift">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">ปฏิทิน</h2>
+                        <button onclick="showAddEvent()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all hover-lift">เพิ่มกิจกรรม</button>
+                    </div>
+
+                    <div id="addEventForm" class="hidden mb-6 p-4 bg-purple-50 rounded-xl">
+                        <h3 class="font-semibold mb-4">เพิ่มกิจกรรมในปฏิทิน</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="eventTitle" placeholder="ชื่อกิจกรรม" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <select id="eventType" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="">เลือกประเภท</option>
+                                <option value="ประชุม">ประชุม</option>
+                                <option value="กิจกรรม">กิจกรรม</option>
+                            </select>
+                            <input type="date" id="eventStartDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <input type="date" id="eventEndDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <input type="time" id="eventStartTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <input type="time" id="eventEndTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <input type="text" id="eventLocation" placeholder="สถานที่" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 md:col-span-2">
+                        </div>
+                        <textarea id="eventDetails" placeholder="รายละเอียด" class="w-full mt-4 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3"></textarea>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="submitEvent()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all">ส่งคำขอ</button>
+                            <button onclick="hideAddEvent()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">ยกเลิก</button>
+                        </div>
+                    </div>
+
+                    <div id="calendarEvents" class="space-y-4">
+                        <p class="text-gray-600">ยังไม่มีกิจกรรมในปฏิทิน</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Page -->
+            <div id="adminPage" class="page hidden">
+                <div class="space-y-6">
+                    <!-- Pending Approvals -->
+                    <div class="glass-effect rounded-2xl p-6 hover-lift">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">คำขออนุมัติ</h2>
+                        <div id="pendingApprovals" class="space-y-4">
+                            <p class="text-gray-600">ไม่มีคำขออนุมัติ</p>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Management -->
+                    <div class="glass-effect rounded-2xl p-6 hover-lift">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold text-gray-800">จัดการอุปกรณ์</h2>
+                            <div class="flex gap-2">
+                                <button onclick="showBorrowHistory()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all hover-lift">ประวัติการยืม</button>
+                                <button onclick="showAddEquipment()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all hover-lift">เพิ่มอุปกรณ์</button>
+                            </div>
+                        </div>
+
+                        <div id="addEquipmentForm" class="hidden mb-6 p-4 bg-blue-50 rounded-xl">
+                            <h3 class="font-semibold mb-4">เพิ่มอุปกรณ์ใหม่</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" id="equipmentName" placeholder="ชื่ออุปกรณ์" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <input type="number" id="equipmentQuantity" placeholder="จำนวน" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <textarea id="equipmentDescription" placeholder="รายละเอียด" class="w-full mt-4 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
+                            <div class="flex gap-2 mt-4">
+                                <button onclick="addEquipment()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">เพิ่มอุปกรณ์</button>
+                                <button onclick="hideAddEquipment()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">ยกเลิก</button>
+                            </div>
+                        </div>
+
+                        <!-- Equipment Tabs -->
+                        <div class="mb-4">
+                            <div class="flex gap-2">
+                                <button onclick="showEquipmentTab('list')" id="equipmentListTab" class="equipment-tab px-4 py-2 rounded-lg bg-blue-600 text-white">รายการอุปกรณ์</button>
+                                <button onclick="showEquipmentTab('borrowed')" id="equipmentBorrowedTab" class="equipment-tab px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">อุปกรณ์ที่ถูกยืม</button>
+                            </div>
+                        </div>
+
+                        <div id="equipmentListView" class="space-y-3">
+                            <p class="text-gray-600">ไม่มีอุปกรณ์</p>
+                        </div>
+
+                        <div id="equipmentBorrowedView" class="hidden space-y-3">
+                            <p class="text-gray-600">ไม่มีอุปกรณ์ที่ถูกยืม</p>
+                        </div>
+                    </div>
+
+                    <!-- Borrow History Modal -->
+                    <div id="borrowHistoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+                        <div class="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xl font-bold">ประวัติการยืม-คืนอุปกรณ์</h2>
+                                <button onclick="hideBorrowHistory()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                            </div>
+                            
+                            <!-- Filter Options -->
+                            <div class="mb-4 flex gap-4">
+                                <select id="historyFilter" onchange="loadBorrowHistory()" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="all">ทั้งหมด</option>
+                                    <option value="borrowed">กำลังยืม</option>
+                                    <option value="returned">คืนแล้ว</option>
+                                </select>
+                                <input type="text" id="searchHistory" placeholder="ค้นหาชื่ออุปกรณ์หรือผู้ยืม" onkeyup="loadBorrowHistory()" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 flex-1">
+                            </div>
+
+                            <div id="borrowHistoryList" class="space-y-3">
+                                <p class="text-gray-600">กำลังโหลดข้อมูล...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Management -->
+                    <div class="glass-effect rounded-2xl p-6 hover-lift">
+                        <h2 class="text-xl font-bold mb-4 text-gray-800">จัดการผู้ใช้งาน</h2>
+                        <div id="usersList" class="space-y-3">
+                            <p class="text-gray-600">กำลังโหลดข้อมูลผู้ใช้...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="bg-white rounded-2xl shadow-lg p-4 text-center">
+                <p class="text-gray-600 text-sm">
+                    &copy; 2024 <span class="font-semibold text-gray-800">SPT MORAL SCHOOL</span> - คณะกรรมการนักเรียนขับเคลื่อนโรงเรียนคุณธรรม สพฐ. โรงเรียนสตรีพัทลุง | <span class="text-gray-500">All Rights Reserved</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Change Password Modal -->
+    <div id="changePasswordModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">แก้ไขรหัสผ่าน</h2>
+                <button onclick="hideChangePassword()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">รหัสผ่านปัจจุบัน</label>
+                    <input type="password" id="currentPassword" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">รหัสผ่านใหม่</label>
+                    <input type="password" id="newPassword" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">ยืนยันรหัสผ่านใหม่</label>
+                    <input type="password" id="confirmPassword" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+            </div>
+            
+            <div class="flex gap-2 mt-6">
+                <button onclick="changePassword()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex-1">บันทึก</button>
+                <button onclick="hideChangePassword()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">ยกเลิก</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBEfvB__jBm18g8bNRG9GVWt1UoE45QCz4",
+            authDomain: "spt-smc.firebaseapp.com",
+            projectId: "spt-smc",
+            storageBucket: "spt-smc.firebasestorage.app",
+            messagingSenderId: "626995626749",
+            appId: "1:626995626749:web:4c380da6deb283c400b494",
+            measurementId: "G-SL41JX2WJW"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let isAdmin = false;
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-500 border-green-600',
+                error: 'bg-red-500 border-red-600',
+                warning: 'bg-yellow-500 border-yellow-600',
+                info: 'bg-blue-500 border-blue-600'
+            };
+
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+
+            notification.className = `${colors[type]} text-white px-6 py-4 rounded-lg shadow-lg border-l-4 transform translate-x-full transition-all duration-300 ease-in-out max-w-sm`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <span class="text-xl mr-3">${icons[type]}</span>
+                    <span class="font-medium">${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200 text-xl">&times;</button>
+                </div>
+            `;
+
+            container.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
         }
 
-        const ref = await db.collection(COL).add({
-          grade, room, prefix, firstName, lastName, nickname, studentId, phone,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        await ref.update({ _confirmedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        toast('ส่งข้อมูลสำเร็จ ขอบคุณค่ะ/ครับ');
-        e.target.reset();
-        // Re-initialize room options after reset
-        initializeRoomSelect();
-      } catch (err){
-        console.error(err);
-        showError('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่');
-      } finally {
-        submitBtn.disabled=false; submitBtn.classList.remove('opacity-70');
-      }
-    });
-    function showError(text){
-      const el = qs('#applyMessage');
-      el.className='mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700';
-      el.textContent = text; show(el);
-    }
-
-    // Date formatting
-    function formatDate(ts){
-      if (!ts) return '-';
-      const d = ts.toDate ? ts.toDate() : new Date(ts);
-      return new Intl.DateTimeFormat('th-TH',{dateStyle:'medium', timeStyle:'short'}).format(d);
-    }
-
-    // Check application system
-    async function checkApplication() {
-      const studentId = qs('#checkStudentId').value.trim();
-      const resultDiv = qs('#checkResult');
-      
-      if (!studentId) {
-        alert('กรุณากรอกเลขประจำตัวนักเรียน');
-        return;
-      }
-      
-      if (!/^[0-9]{5}$/.test(studentId)) {
-        alert('เลขประจำตัวนักเรียนต้องเป็นตัวเลข 5 หลัก');
-        return;
-      }
-
-      try {
-        const snap = await db.collection(COL).where('studentId','==',studentId).get();
-        
-        if (snap.empty) {
-          // Not found
-          resultDiv.innerHTML = `
-            <div class="rounded-xl p-6 bg-red-50 ring-1 ring-red-200">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl">❌</div>
-                <div>
-                  <h3 class="text-lg font-semibold text-red-800">ไม่พบข้อมูลการสมัคร</h3>
-                  <p class="text-red-700">เลขประจำตัวนักเรียน ${studentId} ยังไม่ได้สมัครเข้าร่วมคณะกรรมการ</p>
-                  <p class="text-red-600 text-sm mt-2">หากต้องการสมัคร กรุณาไปที่หน้า "หน้ารับสมัคร"</p>
-                </div>
-              </div>
-            </div>
-          `;
-        } else {
-          // Found
-          const doc = snap.docs[0];
-          const d = doc.data();
-          resultDiv.innerHTML = `
-            <div class="rounded-xl p-6 bg-green-50 ring-1 ring-green-200">
-              <div class="flex items-center gap-3 mb-4">
-                <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl">✅</div>
-                <div>
-                  <h3 class="text-lg font-semibold text-green-800">พบข้อมูลการสมัคร</h3>
-                  <p class="text-green-700">เลขประจำตัวนักเรียน ${studentId} ได้สมัครเข้าร่วมแล้ว</p>
-                </div>
-              </div>
-              <div class="bg-white rounded-lg p-4 ring-1 ring-green-200">
-                <h4 class="font-semibold mb-3">ข้อมูลผู้สมัคร</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <div><span class="text-gray-600">ชื่อ-สกุล:</span> ${d.prefix||''} ${d.firstName||''} ${d.lastName||''}</div>
-                  <div><span class="text-gray-600">ชื่อเล่น:</span> ${d.nickname||''}</div>
-                  <div><span class="text-gray-600">ระดับชั้น:</span> ${d.grade||''}</div>
-                  <div><span class="text-gray-600">ห้อง:</span> ${d.room||''}</div>
-                  <div><span class="text-gray-600">เลขประจำตัว:</span> ${d.studentId||''}</div>
-                  <div><span class="text-gray-600">โทรศัพท์:</span> ${d.phone||''}</div>
-                  <div class="md:col-span-2"><span class="text-gray-600">วันที่สมัคร:</span> ${formatDate(d.createdAt)}</div>
-                </div>
-              </div>
-            </div>
-          `;
+        // Authentication Functions
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
         }
-        
-        show(resultDiv);
-      } catch (err) {
-        console.error(err);
-        alert('เกิดข้อผิดพลาดในการค้นหา กรุณาลองใหม่');
-      }
-    }
 
-    qs('#checkBtn').addEventListener('click', checkApplication);
-    qs('#checkStudentId').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        checkApplication();
-      }
-    });
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+        }
 
-    // Admin auth + panel
-    function updateAdminUI(user){
-      if (user && ADMIN_EMAILS.includes(user.email)){
-        window.__isAdmin = true;
-        hide(qs('#adminLogin')); show(qs('#adminPanel'));
-        setText(qs('#adminStatus'), `เข้าสู่ระบบแล้ว: ${user.email}`);
-        // auto start listener
-        attachAdminListener();
-      } else {
-        window.__isAdmin = false;
-        show(qs('#adminLogin')); hide(qs('#adminPanel'));
-        setText(qs('#adminStatus'), '');
-        if (adminUnsub){ adminUnsub(); adminUnsub=null; }
-      }
-    }
-    auth.onAuthStateChanged(updateAdminUI);
-    qs('#loginForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const email = qs('#loginEmail').value.trim();
-      const password = qs('#loginPassword').value.trim();
-      const btn = qs('#loginBtn');
-      const msg = qs('#loginMsg');
-      btn.disabled = true; btn.classList.add('opacity-60'); msg.classList.add('hidden');
-      try{
-        await auth.signInWithEmailAndPassword(email, password);
-        toast('เข้าสู่ระบบสำเร็จ');
-      } catch(err){
-        msg.textContent = 'เข้าสู่ระบบไม่สำเร็จ โปรดตรวจสอบอีเมลหรือรหัสผ่าน';
-        msg.classList.remove('hidden');
-      } finally {
-        btn.disabled = false; btn.classList.remove('opacity-60');
-      }
-    });
-    qs('#logoutBtn').addEventListener('click', async ()=>{ await auth.signOut(); toast('ออกจากระบบแล้ว'); });
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
 
-    // Admin list
-    let adminUnsub = null;
-    function queryAdmin(){
-      let ref = db.collection(COL);
-      const g = qs('#adminGrade').value;
-      const r = qs('#adminRoom').value;
-      if (g) ref = ref.where('grade','==', g);
-      if (r) ref = ref.where('room','==', r);
-      return ref; // no orderBy; we'll sort locally
-    }
-    function attachAdminListener(){
-      if (!window.__isAdmin) return;
-      if (adminUnsub){ adminUnsub(); adminUnsub=null; }
-      adminUnsub = queryAdmin().onSnapshot(snap=>{
-        const docs = snap.docs.slice().sort((a,b)=>{
-          const ta = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
-          const tb = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
-          return tb - ta; // desc
-        });
-        const tbody = qs('#adminList'); tbody.innerHTML = '';
-        if (!docs.length){ setText(qs('#adminEmpty'),'ยังไม่มีข้อมูลแสดง'); return; }
-        setText(qs('#adminEmpty'),'');
-        docs.forEach(doc=>{
-          const d = doc.data();
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td class="py-3 pr-4">${d.grade||''}</td>
-            <td class="py-3 pr-4">${d.room||''}</td>
-            <td class="py-3 pr-4">${d.prefix||''}</td>
-            <td class="py-3 pr-4">${d.firstName||''}</td>
-            <td class="py-3 pr-4">${d.lastName||''}</td>
-            <td class="py-3 pr-4">${d.nickname||''}</td>
-            <td class="py-3 pr-4">${d.studentId||''}</td>
-            <td class="py-3 pr-4">${d.phone||''}</td>
-            <td class="py-3 pr-4">${formatDate(d.createdAt)}</td>
-            <td class="py-3 pr-4">
-              <div class="flex gap-2">
-                <button class="btn px-3 py-1 rounded-lg bg-gray-100 hover:bg-gray-200" data-action="edit" data-id="${doc.id}">แก้ไข</button>
-                <button class="btn px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white" data-action="delete" data-id="${doc.id}">ลบ</button>
-              </div>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }, err=> console.error(err));
-    }
-    qs('#loadAllBtn').addEventListener('click', attachAdminListener);
-    qs('#adminRoom').addEventListener('change', attachAdminListener);
+            if (!email || !password) {
+                showNotification('กรุณากรอกอีเมลและรหัสผ่าน', 'warning');
+                return;
+            }
 
-    // Admin table actions
-    qs('#adminList').addEventListener('click', async (e)=>{
-      if (!window.__isAdmin){ alert('ต้องเป็นผู้ดูแลเท่านั้น'); return; }
-      const btn = e.target.closest('button'); if (!btn) return;
-      const id = btn.dataset.id; const action = btn.dataset.action;
-      if (action === 'delete'){
-        const ok = confirm('ยืนยันการลบข้อมูลนี้หรือไม่?'); if (!ok) return;
-        try { await db.collection(COL).doc(id).delete(); toast('ลบข้อมูลแล้ว'); }
-        catch(err){ console.error(err); alert('ลบไม่สำเร็จ'); }
-      }
-      if (action === 'edit'){ openEditModal(id); }
-    });
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Check if user is approved
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (!userDoc.exists || !userDoc.data().approved) {
+                    await auth.signOut();
+                    showNotification('บัญชีของคุณยังไม่ได้รับการอนุมัติ กรุณารอการอนุมัติจากผู้ดูแลระบบ', 'warning');
+                    return;
+                }
 
-    // Edit modal
-    function openEditModal(id){
-      db.collection(COL).doc(id).get().then(doc=>{
-        if (!doc.exists) return;
-        const d = doc.data();
-        qs('#editId').value = doc.id;
-        qs('#editGrade').value = d.grade || 'ม.1';
-        // Ensure fillRooms is called before setting the value
-        fillRooms(qs('#editRoom')); 
-        qs('#editRoom').value = d.room || '';
-        qs('#editPrefix').value = d.prefix || 'นาย';
-        qs('#editFirstName').value = d.firstName || '';
-        qs('#editLastName').value = d.lastName || '';
-        qs('#editNickname').value = d.nickname || '';
-        qs('#editStudentId').value = d.studentId || '';
-        qs('#editPhone').value = d.phone || '';
-        const m = qs('#editModal'); m.classList.remove('hidden'); m.classList.add('flex');
-      });
-    }
-    function closeEdit(){ const m = qs('#editModal'); m.classList.add('hidden'); m.classList.remove('flex'); }
-    qs('#closeEditModal').addEventListener('click', closeEdit);
-    qs('#cancelEdit').addEventListener('click', (e)=>{ e.preventDefault(); closeEdit(); });
-    qs('#editForm').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const id = qs('#editId').value;
-      const data = {
-        grade: qs('#editGrade').value,
-        room: qs('#editRoom').value,
-        prefix: qs('#editPrefix').value,
-        firstName: qs('#editFirstName').value.trim(),
-        lastName: qs('#editLastName').value.trim(),
-        nickname: qs('#editNickname').value.trim(),
-        studentId: qs('#editStudentId').value.trim(),
-        phone: qs('#editPhone').value.trim(),
-      };
-      if (!/^[0-9]{5}$/.test(data.studentId)){ alert('เลขประจำตัวนักเรียนต้องเป็นตัวเลข 5 หลัก'); return; }
-      if (!/^[0-9]{9,10}$/.test(data.phone)){ alert('เบอร์โทรต้องเป็นตัวเลข 9–10 หลัก'); return; }
-      try { await db.collection(COL).doc(id).update(data); toast('บันทึกการแก้ไขแล้ว'); closeEdit(); }
-      catch(err){ console.error(err); alert('แก้ไขไม่สำเร็จ'); }
-    });
+                currentUser = user;
+                isAdmin = email === 'sptmorral@spt.ac.th';
+                showNotification('เข้าสู่ระบบสำเร็จ!', 'success');
+                showMainApp();
+            } catch (error) {
+                showNotification('อีเมลหรือรหัสผ่านไม่ถูกต้อง', 'error');
+            }
+        }
 
-    // CSV helpers
-    function toCSVRow(values){
-      return values.map(v=>{
-        if (v==null) v='';
-        v = String(v).replace(/"/g,'""');
-        if (v.includes(',') || v.includes('"') || v.includes('\n')) return `"${v}"`;
-        return v;
-      }).join(',');
-    }
-    function downloadCSV(filename, rows){
-      try {
-        const csv = rows.join('\n');
-        const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'}); // BOM for Excel UTF-8
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
-      } catch(err){
-        console.error(err);
-        alert('ไม่สามารถสร้างไฟล์ CSV ได้');
-      }
-    }
+        async function register() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
 
-    // Export filtered (admin)
-    qs('#exportBtn').addEventListener('click', async ()=>{
-      if (!window.__isAdmin){ alert('ต้องเป็นผู้ดูแลเท่านั้น'); return; }
-      try {
-        const snap = await queryAdmin().get();
-        const docs = snap.docs.slice().sort((a,b)=>{
-          const ta = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
-          const tb = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
-          return tb - ta;
-        });
-        const headers = ['ชั้น','ห้อง','คำนำหน้า','ชื่อ','นามสกุล','ชื่อเล่น','เลขประจำตัว','โทรศัพท์','เวลา','DocID'];
-        const rows = [toCSVRow(headers)];
-        docs.forEach(doc=>{
-          const d = doc.data();
-          rows.push(toCSVRow([d.grade||'', d.room||'', d.prefix||'', d.firstName||'', d.lastName||'', d.nickname||'', d.studentId||'', d.phone||'', formatDate(d.createdAt), doc.id]));
-        });
-        downloadCSV('SPT-Moral-Applications.csv', rows);
-        toast('ส่งออกไฟล์ CSV แล้ว');
-      } catch(err){ console.error(err); alert('ส่งออกไม่สำเร็จ'); }
-    });
+            if (!name || !email || !password) {
+                showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
+                return;
+            }
 
-    // Export all (admin)
-    qs('#exportAllBtn').addEventListener('click', async ()=>{
-      if (!window.__isAdmin){ alert('ต้องเป็นผู้ดูแลเท่านั้น'); return; }
-      try {
-        const snap = await db.collection(COL).get();
-        const docs = snap.docs.slice().sort((a,b)=>{
-          const ta = (a.data().createdAt && a.data().createdAt.toMillis) ? a.data().createdAt.toMillis() : 0;
-          const tb = (b.data().createdAt && b.data().createdAt.toMillis) ? b.data().createdAt.toMillis() : 0;
-          return tb - ta;
-        });
-        const headers = ['ชั้น','ห้อง','คำนำหน้า','ชื่อ','นามสกุล','ชื่อเล่น','เลขประจำตัว','โทรศัพท์','เวลา','DocID'];
-        const rows = [toCSVRow(headers)];
-        docs.forEach(doc=>{
-          const d = doc.data();
-          rows.push(toCSVRow([d.grade||'', d.room||'', d.prefix||'', d.firstName||'', d.lastName||'', d.nickname||'', d.studentId||'', d.phone||'', formatDate(d.createdAt), doc.id]));
-        });
-        downloadCSV('SPT-Moral-All.csv', rows);
-        toast('ส่งออกทั้งหมดเป็น CSV แล้ว');
-      } catch(err){ console.error(err); alert('ส่งออกไม่สำเร็จ'); }
-    });
+            if (password.length < 6) {
+                showNotification('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร', 'warning');
+                return;
+            }
 
-    // Clear All Data (Admin) - Added implementation
-    qs('#clearAllBtn').addEventListener('click', async () => {
-        if (!window.__isAdmin) { alert('ต้องเป็นผู้ดูแลเท่านั้น'); return; }
-        const ok = confirm('*** คำเตือน: คุณต้องการลบข้อมูลการสมัครทั้งหมดจริงหรือไม่? การดำเนินการนี้ไม่สามารถย้อนกลับได้! ***');
-        if (!ok) return;
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
 
-        try {
-            const snap = await db.collection(COL).get();
-            const batch = db.batch();
-            snap.docs.forEach(doc => {
-                batch.delete(doc.ref);
+                await db.collection('users').doc(user.uid).set({
+                    name: name,
+                    email: email,
+                    approved: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await auth.signOut();
+                showNotification('สมัครสมาชิกสำเร็จ กรุณารอการอนุมัติจากผู้ดูแลระบบ', 'success');
+                showLogin();
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        function logout() {
+            auth.signOut();
+            currentUser = null;
+            isAdmin = false;
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            showNotification('ออกจากระบบเรียบร้อยแล้ว', 'info');
+        }
+
+        function showMainApp() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // Update user info
+            document.getElementById('userInfo').textContent = currentUser.email;
+            
+            // Show admin button if admin
+            if (isAdmin) {
+                document.getElementById('adminBtn').classList.remove('hidden');
+                document.getElementById('addLineGroupBtn').classList.remove('hidden');
+            }
+
+            showPage('home');
+            loadData();
+        }
+
+        // Navigation Functions
+        function showPage(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
             });
-            await batch.commit();
-            toast('ล้างข้อมูลทั้งหมดสำเร็จแล้ว');
-        } catch (err) {
-            console.error(err);
-            alert('ล้างข้อมูลไม่สำเร็จ กรุณาตรวจสอบคอนโซล');
+
+            // Show selected page
+            document.getElementById(pageName + 'Page').classList.remove('hidden');
+
+            // Update navigation buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('text-gray-600', 'hover:bg-gray-100');
+            });
+
+            const activeBtn = document.querySelector(`[data-page="${pageName}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-blue-600', 'text-white');
+                activeBtn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+            }
+
+            // Load page-specific data
+            if (pageName === 'home') {
+                loadHomeData();
+            } else if (pageName === 'admin' && isAdmin) {
+                loadAdminData();
+            }
         }
-    });
 
-    // Export dashboard room - Fix incomplete logic block
-    // The previous code block for '#exportDashBtn' was incomplete, closing the script tag prematurely. 
-    // Since there is no 'dashGrade' or 'dashRoom' in the HTML, and the request was for tab switching and room select, 
-    // I'm terminating the incomplete block gracefully with an alert and closing tag.
-    qs('#exportDashBtn').addEventListener('click', async ()=>{
-      alert('ฟังก์ชันนี้ยังไม่สมบูรณ์ หรือไม่มีส่วนประกอบที่จำเป็นในหน้านี้');
-    });
+        // Data Loading Functions
+        function loadData() {
+            loadActivities();
+            loadLineGroups();
+            loadEquipment();
+            loadCalendarEvents();
+        }
 
-  </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98c316f55248731f',t:'MTc2MDA2NzU1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+        function loadHomeData() {
+            loadCalendar();
+            loadHomeSummary();
+            loadRecentActivities();
+            loadRecentLineGroups();
+            loadUpcomingEvents();
+            loadEquipmentStatus();
+        }
+
+        function loadHomeSummary() {
+            // Count activities (show approved for all users, all for admin)
+            if (isAdmin) {
+                db.collection('activities').get().then(snapshot => {
+                    document.getElementById('totalActivities').textContent = snapshot.size;
+                });
+            } else {
+                db.collection('activities').where('approved', '==', true).get().then(snapshot => {
+                    document.getElementById('totalActivities').textContent = snapshot.size;
+                });
+            }
+
+            // Count line groups
+            db.collection('linegroups').get().then(snapshot => {
+                document.getElementById('totalLineGroups').textContent = snapshot.size;
+            });
+
+            // Count equipment
+            db.collection('equipment').get().then(snapshot => {
+                document.getElementById('totalEquipment').textContent = snapshot.size;
+            });
+
+            // Count calendar events (show approved for all users, all for admin)
+            if (isAdmin) {
+                db.collection('calendarEvents').get().then(snapshot => {
+                    document.getElementById('totalCalendarEvents').textContent = snapshot.size;
+                });
+            } else {
+                db.collection('calendarEvents').where('approved', '==', true).get().then(snapshot => {
+                    document.getElementById('totalCalendarEvents').textContent = snapshot.size;
+                });
+            }
+        }
+
+        function loadRecentActivities() {
+            const recentActivities = document.getElementById('recentActivities');
+            
+            db.collection('activities')
+                .orderBy('createdAt', 'desc')
+                .limit(5)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        recentActivities.innerHTML = '<p class="text-gray-600">ไม่มีกิจกรรม</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    let count = 0;
+                    snapshot.forEach(doc => {
+                        const activity = doc.data();
+                        // Show approved activities to all users, and all activities to admin
+                        if ((activity.approved || isAdmin) && count < 3) {
+                            const statusBadge = activity.approved ? 
+                                '<span class="px-1 py-0.5 bg-green-100 text-green-800 text-xs rounded">อนุมัติแล้ว</span>' : 
+                                '<span class="px-1 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded">รออนุมัติ</span>';
+                            
+                            html += `
+                                <div class="bg-white rounded-lg p-3 border-l-4 border-blue-500">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h4 class="font-medium text-sm">${activity.name}</h4>
+                                                ${statusBadge}
+                                            </div>
+                                            <p class="text-xs text-gray-600">📅 ${activity.date} เวลา ${activity.time}</p>
+                                            <p class="text-xs text-gray-600">📍 ${activity.location}</p>
+                                        </div>
+                                        ${isAdmin ? `<button onclick="deleteActivity('${doc.id}')" class="text-red-500 hover:text-red-700 text-xs ml-2">ลบ</button>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                            count++;
+                        }
+                    });
+                    
+                    if (html === '') {
+                        recentActivities.innerHTML = '<p class="text-gray-600">ไม่มีกิจกรรม</p>';
+                    } else {
+                        recentActivities.innerHTML = html;
+                    }
+                });
+        }
+
+        function loadRecentLineGroups() {
+            const recentLineGroups = document.getElementById('recentLineGroups');
+            
+            db.collection('linegroups')
+                .orderBy('createdAt', 'desc')
+                .limit(3)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        recentLineGroups.innerHTML = '<p class="text-gray-600">ไม่มีกลุ่มไลน์</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const group = doc.data();
+                        html += `
+                            <div class="bg-white rounded-lg p-3 border-l-4 border-green-500">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-sm">${group.name}</h4>
+                                        <a href="${group.link}" target="_blank" class="text-xs text-green-600 hover:text-green-800">เข้าร่วมกลุ่ม →</a>
+                                    </div>
+                                    ${isAdmin ? `<button onclick="deleteLineGroup('${doc.id}')" class="text-red-500 hover:text-red-700 text-xs ml-2">ลบ</button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    recentLineGroups.innerHTML = html;
+                });
+        }
+
+        function loadUpcomingEvents() {
+            const upcomingEvents = document.getElementById('upcomingEvents');
+            const today = new Date().toISOString().split('T')[0];
+            
+            db.collection('calendarEvents')
+                .where('startDate', '>=', today)
+                .orderBy('startDate', 'asc')
+                .limit(5)
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        upcomingEvents.innerHTML = '<p class="text-gray-600">ไม่มีกิจกรรมที่จะมาถึง</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    let count = 0;
+                    snapshot.forEach(doc => {
+                        const event = doc.data();
+                        // Show approved events to all users, and all events to admin
+                        if ((event.approved || isAdmin) && count < 3) {
+                            const typeColor = event.type === 'ประชุม' ? 'border-blue-500' : 'border-orange-500';
+                            const statusBadge = event.approved ? 
+                                '<span class="px-1 py-0.5 bg-green-100 text-green-800 text-xs rounded">อนุมัติแล้ว</span>' : 
+                                '<span class="px-1 py-0.5 bg-yellow-100 text-yellow-800 text-xs rounded">รออนุมัติ</span>';
+                            
+                            html += `
+                                <div class="bg-white rounded-lg p-3 border-l-4 ${typeColor}">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h4 class="font-medium text-sm">${event.title}</h4>
+                                                ${statusBadge}
+                                            </div>
+                                            <p class="text-xs text-gray-600">📅 ${event.startDate}</p>
+                                            <p class="text-xs text-gray-600">⏰ ${event.startTime}</p>
+                                            <p class="text-xs text-gray-600">📍 ${event.location}</p>
+                                        </div>
+                                        ${isAdmin ? `<button onclick="deleteCalendarEvent('${doc.id}')" class="text-red-500 hover:text-red-700 text-xs ml-2">ลบ</button>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                            count++;
+                        }
+                    });
+                    
+                    if (html === '') {
+                        upcomingEvents.innerHTML = '<p class="text-gray-600">ไม่มีกิจกรรมที่จะมาถึง</p>';
+                    } else {
+                        upcomingEvents.innerHTML = html;
+                    }
+                });
+        }
+
+        function loadCalendar() {
+            const now = new Date();
+            const monthNames = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+                              'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            
+            document.getElementById('currentMonth').textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            const startDate = firstDay.getDay();
+
+            let daysHTML = '';
+            
+            // Empty cells for days before month starts
+            for (let i = 0; i < startDate; i++) {
+                daysHTML += '<div class="p-2"></div>';
+            }
+
+            // Days of the month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const isToday = day === now.getDate();
+                const dayClass = isToday ? 'bg-blue-600 text-white' : 'hover:bg-gray-100';
+                daysHTML += `<div class="p-2 rounded cursor-pointer ${dayClass}">${day}</div>`;
+            }
+
+            document.getElementById('calendarDays').innerHTML = daysHTML;
+        }
+
+        function loadEquipmentStatus() {
+            const equipmentStatus = document.getElementById('equipmentStatus');
+            
+            db.collection('equipment').limit(4).onSnapshot(snapshot => {
+                if (snapshot.empty) {
+                    equipmentStatus.innerHTML = '<p class="text-gray-600">ไม่มีข้อมูลอุปกรณ์</p>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const item = doc.data();
+                    const percentage = Math.round((item.available / item.total) * 100);
+                    const statusColor = percentage > 50 ? 'text-green-600' : percentage > 20 ? 'text-yellow-600' : 'text-red-600';
+                    const barColor = percentage > 50 ? 'bg-green-500' : percentage > 20 ? 'bg-yellow-500' : 'bg-red-500';
+                    const borrowed = item.total - item.available;
+                    
+                    html += `
+                        <div class="bg-white rounded-lg p-3">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-medium text-sm">${item.name}</h4>
+                                <span class="text-xs ${statusColor}">${item.available}/${item.total}</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="${barColor} h-2 rounded-full" style="width: ${percentage}%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-600 mt-1">
+                                <span>ว่าง ${percentage}%</span>
+                                <span>ยืม ${borrowed} ชิ้น</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                equipmentStatus.innerHTML = html;
+            });
+        }
+
+        // Activity Functions
+        function showAddActivity() {
+            document.getElementById('addActivityForm').classList.remove('hidden');
+        }
+
+        function hideAddActivity() {
+            document.getElementById('addActivityForm').classList.add('hidden');
+            clearActivityForm();
+        }
+
+        function clearActivityForm() {
+            document.getElementById('activityName').value = '';
+            document.getElementById('activityDate').value = '';
+            document.getElementById('activityTime').value = '';
+            document.getElementById('activityLocation').value = '';
+            document.getElementById('activityDetails').value = '';
+        }
+
+        async function submitActivity() {
+            const name = document.getElementById('activityName').value;
+            const date = document.getElementById('activityDate').value;
+            const time = document.getElementById('activityTime').value;
+            const location = document.getElementById('activityLocation').value;
+            const details = document.getElementById('activityDetails').value;
+
+            if (!name || !date || !time || !location) {
+                showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
+                return;
+            }
+
+            try {
+                await db.collection('activities').add({
+                    name: name,
+                    date: date,
+                    time: time,
+                    location: location,
+                    details: details,
+                    submittedBy: currentUser.uid,
+                    submittedByEmail: currentUser.email,
+                    approved: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showNotification('ส่งคำขอกิจกรรมสำเร็จ รอการอนุมัติจากผู้ดูแลระบบ', 'success');
+                hideAddActivity();
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        function loadActivities() {
+            const activitiesList = document.getElementById('activitiesList');
+            
+            db.collection('activities')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        activitiesList.innerHTML = '<p class="text-gray-600">ยังไม่มีกิจกรรม</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const activity = doc.data();
+                        // Show approved activities to all users, and all activities to admin
+                        if (activity.approved || isAdmin) {
+                            const statusBadge = activity.approved ? 
+                                '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">อนุมัติแล้ว</span>' : 
+                                '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">รออนุมัติ</span>';
+                            
+                            html += `
+                                <div class="bg-white rounded-xl p-4 shadow-sm border hover-lift">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h3 class="font-semibold text-lg">${activity.name}</h3>
+                                                ${statusBadge}
+                                            </div>
+                                        </div>
+                                        ${isAdmin ? `<button onclick="deleteActivity('${doc.id}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-all text-sm">ลบ</button>` : ''}
+                                    </div>
+                                    <p class="text-gray-600">📅 ${activity.date} เวลา ${activity.time}</p>
+                                    <p class="text-gray-600">📍 ${activity.location}</p>
+                                    <p class="mt-2">${activity.details || ''}</p>
+                                    ${activity.submittedByEmail ? `<p class="text-xs text-gray-500 mt-2">ส่งโดย: ${activity.submittedByEmail}</p>` : ''}
+                                </div>
+                            `;
+                        }
+                    });
+                    
+                    if (html === '') {
+                        activitiesList.innerHTML = '<p class="text-gray-600">ยังไม่มีกิจกรรม</p>';
+                    } else {
+                        activitiesList.innerHTML = html;
+                    }
+                });
+        }
+
+        // Line Groups Functions
+        function showAddLineGroup() {
+            document.getElementById('addLineGroupForm').classList.remove('hidden');
+        }
+
+        function hideAddLineGroup() {
+            document.getElementById('addLineGroupForm').classList.add('hidden');
+            document.getElementById('lineGroupName').value = '';
+            document.getElementById('lineGroupLink').value = '';
+        }
+
+        async function addLineGroup() {
+            const name = document.getElementById('lineGroupName').value;
+            const link = document.getElementById('lineGroupLink').value;
+
+            if (!name || !link) {
+                showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
+                return;
+            }
+
+            try {
+                await db.collection('linegroups').add({
+                    name: name,
+                    link: link,
+                    createdBy: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showNotification('เพิ่มกลุ่มไลน์สำเร็จ', 'success');
+                hideAddLineGroup();
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        function loadLineGroups() {
+            const lineGroupsList = document.getElementById('lineGroupsList');
+            
+            db.collection('linegroups')
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        lineGroupsList.innerHTML = '<p class="text-gray-600">ยังไม่มีกลุ่มไลน์</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const group = doc.data();
+                        html += `
+                            <div class="bg-white rounded-xl p-4 shadow-sm border hover-lift">
+                                <h3 class="font-semibold text-lg mb-2">${group.name}</h3>
+                                <div class="flex gap-2">
+                                    <a href="${group.link}" target="_blank" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all inline-block">เข้าร่วมกลุ่ม</a>
+                                    ${isAdmin ? `<button onclick="deleteLineGroup('${doc.id}')" class="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-all">ลบ</button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    lineGroupsList.innerHTML = html;
+                });
+        }
+
+        // Equipment Functions
+        function loadEquipment() {
+            const availableEquipment = document.getElementById('availableEquipment');
+            const myBorrowedEquipment = document.getElementById('myBorrowedEquipment');
+            
+            // Load available equipment
+            db.collection('equipment').where('available', '>', 0).onSnapshot(snapshot => {
+                if (snapshot.empty) {
+                    availableEquipment.innerHTML = '<p class="text-gray-600">ไม่มีอุปกรณ์ให้ยืม</p>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const equipment = doc.data();
+                    html += `
+                        <div class="bg-white rounded-xl p-4 shadow-sm border">
+                            <h3 class="font-semibold">${equipment.name}</h3>
+                            <p class="text-gray-600">${equipment.description}</p>
+                            <p class="text-sm text-green-600">มีให้ยืม: ${equipment.available} ชิ้น</p>
+                            <button onclick="borrowEquipment('${doc.id}')" class="mt-2 bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition-all">ยืม</button>
+                        </div>
+                    `;
+                });
+                availableEquipment.innerHTML = html;
+            });
+
+            // Load user's borrowed equipment
+            if (currentUser) {
+                db.collection('borrowedEquipment')
+                    .where('borrowedBy', '==', currentUser.uid)
+                    .where('returned', '==', false)
+                    .onSnapshot(snapshot => {
+                        if (snapshot.empty) {
+                            myBorrowedEquipment.innerHTML = '<p class="text-gray-600">ไม่มีอุปกรณ์ที่ยืม</p>';
+                            return;
+                        }
+
+                        let html = '';
+                        snapshot.forEach(doc => {
+                            const borrowed = doc.data();
+                            html += `
+                                <div class="bg-white rounded-xl p-4 shadow-sm border">
+                                    <h3 class="font-semibold">${borrowed.equipmentName}</h3>
+                                    <p class="text-gray-600">ยืมเมื่อ: ${borrowed.borrowedAt?.toDate().toLocaleDateString('th-TH')}</p>
+                                    <button onclick="returnEquipment('${doc.id}')" class="mt-2 bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-all">คืน</button>
+                                </div>
+                            `;
+                        });
+                        myBorrowedEquipment.innerHTML = html;
+                    });
+            }
+        }
+
+        async function borrowEquipment(equipmentId) {
+            try {
+                const equipmentDoc = await db.collection('equipment').doc(equipmentId).get();
+                if (!equipmentDoc.exists) {
+                    showNotification('ไม่พบอุปกรณ์', 'error');
+                    return;
+                }
+
+                const equipment = equipmentDoc.data();
+                if (equipment.available <= 0) {
+                    showNotification('อุปกรณ์หมด', 'warning');
+                    return;
+                }
+
+                // Create borrow request
+                await db.collection('borrowRequests').add({
+                    equipmentId: equipmentId,
+                    equipmentName: equipment.name,
+                    requestedBy: currentUser.uid,
+                    requestedByEmail: currentUser.email,
+                    approved: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showNotification('ส่งคำขอยืมอุปกรณ์สำเร็จ รอการอนุมัติจากผู้ดูแลระบบ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        async function returnEquipment(borrowedId) {
+            try {
+                const borrowedDoc = await db.collection('borrowedEquipment').doc(borrowedId).get();
+                if (!borrowedDoc.exists) {
+                    showNotification('ไม่พบข้อมูลการยืม', 'error');
+                    return;
+                }
+                
+                const borrowed = borrowedDoc.data();
+
+                // Use batch to ensure both operations succeed or fail together
+                const batch = db.batch();
+
+                // Update borrowed equipment record
+                const borrowedRef = db.collection('borrowedEquipment').doc(borrowedId);
+                batch.update(borrowedRef, {
+                    returned: true,
+                    returnedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Update equipment availability
+                const equipmentRef = db.collection('equipment').doc(borrowed.equipmentId);
+                batch.update(equipmentRef, {
+                    available: firebase.firestore.FieldValue.increment(1)
+                });
+
+                await batch.commit();
+                showNotification('คืนอุปกรณ์สำเร็จ', 'success');
+            } catch (error) {
+                console.error('Error returning equipment:', error);
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        // Calendar Events Functions
+        function showAddEvent() {
+            document.getElementById('addEventForm').classList.remove('hidden');
+        }
+
+        function hideAddEvent() {
+            document.getElementById('addEventForm').classList.add('hidden');
+            clearEventForm();
+        }
+
+        function clearEventForm() {
+            document.getElementById('eventTitle').value = '';
+            document.getElementById('eventType').value = '';
+            document.getElementById('eventStartDate').value = '';
+            document.getElementById('eventEndDate').value = '';
+            document.getElementById('eventStartTime').value = '';
+            document.getElementById('eventEndTime').value = '';
+            document.getElementById('eventLocation').value = '';
+            document.getElementById('eventDetails').value = '';
+        }
+
+        async function submitEvent() {
+            const title = document.getElementById('eventTitle').value;
+            const type = document.getElementById('eventType').value;
+            const startDate = document.getElementById('eventStartDate').value;
+            const endDate = document.getElementById('eventEndDate').value;
+            const startTime = document.getElementById('eventStartTime').value;
+            const endTime = document.getElementById('eventEndTime').value;
+            const location = document.getElementById('eventLocation').value;
+            const details = document.getElementById('eventDetails').value;
+
+            if (!title || !type || !startDate || !startTime || !location) {
+                showNotification('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน', 'warning');
+                return;
+            }
+
+            try {
+                await db.collection('calendarEvents').add({
+                    title: title,
+                    type: type,
+                    startDate: startDate,
+                    endDate: endDate || startDate,
+                    startTime: startTime,
+                    endTime: endTime,
+                    location: location,
+                    details: details,
+                    submittedBy: currentUser.uid,
+                    submittedByEmail: currentUser.email,
+                    approved: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showNotification('ส่งคำขอเพิ่มกิจกรรมในปฏิทินสำเร็จ รอการอนุมัติจากผู้ดูแลระบบ', 'success');
+                hideAddEvent();
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        function loadCalendarEvents() {
+            const calendarEvents = document.getElementById('calendarEvents');
+            
+            db.collection('calendarEvents')
+                .orderBy('startDate', 'asc')
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        calendarEvents.innerHTML = '<p class="text-gray-600">ยังไม่มีกิจกรรมในปฏิทิน</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const event = doc.data();
+                        // Show approved events to all users, and all events to admin
+                        if (event.approved || isAdmin) {
+                            const typeColor = event.type === 'ประชุม' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+                            const statusBadge = event.approved ? 
+                                '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full ml-2">อนุมัติแล้ว</span>' : 
+                                '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full ml-2">รออนุมัติ</span>';
+                            
+                            html += `
+                                <div class="bg-white rounded-xl p-4 shadow-sm border">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div class="flex-1">
+                                            <div class="flex items-center gap-2 mb-2">
+                                                <h3 class="font-semibold text-lg">${event.title}</h3>
+                                                <span class="px-2 py-1 rounded-full text-xs ${typeColor}">${event.type}</span>
+                                                ${statusBadge}
+                                            </div>
+                                        </div>
+                                        ${isAdmin ? `<button onclick="deleteCalendarEvent('${doc.id}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-all text-sm ml-2">ลบ</button>` : ''}
+                                    </div>
+                                    <p class="text-gray-600">📅 ${event.startDate}${event.endDate !== event.startDate ? ' - ' + event.endDate : ''}</p>
+                                    <p class="text-gray-600">⏰ ${event.startTime}${event.endTime ? ' - ' + event.endTime : ''}</p>
+                                    <p class="text-gray-600">📍 ${event.location}</p>
+                                    ${event.details ? `<p class="mt-2">${event.details}</p>` : ''}
+                                    ${event.submittedByEmail ? `<p class="text-xs text-gray-500 mt-2">ส่งโดย: ${event.submittedByEmail}</p>` : ''}
+                                </div>
+                            `;
+                        }
+                    });
+                    
+                    if (html === '') {
+                        calendarEvents.innerHTML = '<p class="text-gray-600">ยังไม่มีกิจกรรมในปฏิทิน</p>';
+                    } else {
+                        calendarEvents.innerHTML = html;
+                    }
+                });
+        }
+
+        // Admin Functions
+        function loadAdminData() {
+            loadPendingApprovals();
+            loadUsersList();
+            loadEquipmentList();
+        }
+
+        function loadPendingApprovals() {
+            const pendingApprovals = document.getElementById('pendingApprovals');
+            let allPendingHtml = '';
+
+            // Load pending user registrations
+            db.collection('users').where('approved', '==', false).onSnapshot(userSnapshot => {
+                let userHtml = '';
+                userSnapshot.forEach(doc => {
+                    const user = doc.data();
+                    userHtml += `
+                        <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
+                            <h4 class="font-semibold">การสมัครสมาชิก</h4>
+                            <p>ชื่อ: ${user.name}</p>
+                            <p>อีเมล: ${user.email}</p>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="approveUser('${doc.id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-all">อนุมัติ</button>
+                                <button onclick="rejectUser('${doc.id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition-all">ปฏิเสธ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Load other pending requests
+                loadOtherPendingRequests().then(otherHtml => {
+                    const totalHtml = userHtml + otherHtml;
+                    pendingApprovals.innerHTML = totalHtml || '<p class="text-gray-600">ไม่มีคำขออนุมัติ</p>';
+                });
+            });
+        }
+
+        async function loadOtherPendingRequests() {
+            let html = '';
+
+            try {
+                // Activities
+                const activitiesSnapshot = await db.collection('activities').where('approved', '==', false).get();
+                activitiesSnapshot.forEach(doc => {
+                    const activity = doc.data();
+                    html += `
+                        <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                            <h4 class="font-semibold">คำขอกิจกรรม</h4>
+                            <p>ชื่อ: ${activity.name}</p>
+                            <p>วันที่: ${activity.date} เวลา ${activity.time}</p>
+                            <p>สถานที่: ${activity.location}</p>
+                            <p>ส่งโดย: ${activity.submittedByEmail}</p>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="approveActivity('${doc.id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-all">อนุมัติ</button>
+                                <button onclick="rejectActivity('${doc.id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition-all">ปฏิเสธ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Calendar Events
+                const eventsSnapshot = await db.collection('calendarEvents').where('approved', '==', false).get();
+                eventsSnapshot.forEach(doc => {
+                    const event = doc.data();
+                    html += `
+                        <div class="bg-purple-50 rounded-xl p-4 border border-purple-200">
+                            <h4 class="font-semibold">คำขอเพิ่มปฏิทิน</h4>
+                            <p>ชื่อ: ${event.title}</p>
+                            <p>ประเภท: ${event.type}</p>
+                            <p>วันที่: ${event.startDate}</p>
+                            <p>ส่งโดย: ${event.submittedByEmail}</p>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="approveEvent('${doc.id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-all">อนุมัติ</button>
+                                <button onclick="rejectEvent('${doc.id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition-all">ปฏิเสธ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Borrow Requests
+                const borrowSnapshot = await db.collection('borrowRequests').where('approved', '==', false).get();
+                borrowSnapshot.forEach(doc => {
+                    const request = doc.data();
+                    html += `
+                        <div class="bg-orange-50 rounded-xl p-4 border border-orange-200">
+                            <h4 class="font-semibold">คำขอยืมอุปกรณ์</h4>
+                            <p>อุปกรณ์: ${request.equipmentName}</p>
+                            <p>ผู้ขอยืม: ${request.requestedByEmail}</p>
+                            <div class="flex gap-2 mt-2">
+                                <button onclick="approveBorrow('${doc.id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition-all">อนุมัติ</button>
+                                <button onclick="rejectBorrow('${doc.id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition-all">ปฏิเสธ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.log('Error loading pending requests:', error);
+            }
+
+            return html;
+        }
+
+        // Admin Approval Functions
+        async function approveUser(userId) {
+            try {
+                await db.collection('users').doc(userId).update({ approved: true });
+                showNotification('อนุมัติผู้ใช้สำเร็จ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        async function rejectUser(userId) {
+            try {
+                await db.collection('users').doc(userId).delete();
+                showNotification('ปฏิเสธผู้ใช้สำเร็จ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        async function approveActivity(activityId) {
+            try {
+                await db.collection('activities').doc(activityId).update({ approved: true });
+                showNotification('อนุมัติกิจกรรมสำเร็จ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        async function rejectActivity(activityId) {
+            try {
+                await db.collection('activities').doc(activityId).delete();
+                showNotification('ปฏิเสธกิจกรรมสำเร็จ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        async function approveEvent(eventId) {
+            try {
+                await db.collection('calendarEvents').doc(eventId).update({ approved: true });
+                showNotification('อนุมัติกิจกรรมในปฏิทินสำเร็จ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        async function rejectEvent(eventId) {
+            try {
+                await db.collection('calendarEvents').doc(eventId).delete();
+                showNotification('ปฏิเสธกิจกรรมในปฏิทินสำเร็จ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        async function approveBorrow(requestId) {
+            try {
+                const requestDoc = await db.collection('borrowRequests').doc(requestId).get();
+                const request = requestDoc.data();
+
+                // Create borrowed equipment record
+                await db.collection('borrowedEquipment').add({
+                    equipmentId: request.equipmentId,
+                    equipmentName: request.equipmentName,
+                    borrowedBy: request.requestedBy,
+                    borrowedByEmail: request.requestedByEmail,
+                    borrowedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    returned: false
+                });
+
+                // Update equipment availability
+                const equipmentDoc = await db.collection('equipment').doc(request.equipmentId).get();
+                const equipment = equipmentDoc.data();
+                await db.collection('equipment').doc(request.equipmentId).update({
+                    available: equipment.available - 1
+                });
+
+                // Delete the request
+                await db.collection('borrowRequests').doc(requestId).delete();
+
+                showNotification('อนุมัติการยืมอุปกรณ์สำเร็จ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        async function rejectBorrow(requestId) {
+            try {
+                await db.collection('borrowRequests').doc(requestId).delete();
+                showNotification('ปฏิเสธการยืมอุปกรณ์สำเร็จ', 'success');
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        // Equipment Management
+        function showAddEquipment() {
+            document.getElementById('addEquipmentForm').classList.remove('hidden');
+        }
+
+        function hideAddEquipment() {
+            document.getElementById('addEquipmentForm').classList.add('hidden');
+            document.getElementById('equipmentName').value = '';
+            document.getElementById('equipmentQuantity').value = '';
+            document.getElementById('equipmentDescription').value = '';
+        }
+
+        async function addEquipment() {
+            const name = document.getElementById('equipmentName').value;
+            const quantity = parseInt(document.getElementById('equipmentQuantity').value);
+            const description = document.getElementById('equipmentDescription').value;
+
+            if (!name || !quantity || quantity <= 0) {
+                showNotification('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง', 'warning');
+                return;
+            }
+
+            try {
+                await db.collection('equipment').add({
+                    name: name,
+                    total: quantity,
+                    available: quantity,
+                    description: description,
+                    createdBy: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showNotification('เพิ่มอุปกรณ์สำเร็จ', 'success');
+                hideAddEquipment();
+            } catch (error) {
+                showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+            }
+        }
+
+        function showEquipmentTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.equipment-tab').forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+            });
+
+            if (tab === 'list') {
+                document.getElementById('equipmentListTab').classList.add('bg-blue-600', 'text-white');
+                document.getElementById('equipmentListTab').classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                document.getElementById('equipmentListView').classList.remove('hidden');
+                document.getElementById('equipmentBorrowedView').classList.add('hidden');
+                loadEquipmentList();
+            } else if (tab === 'borrowed') {
+                document.getElementById('equipmentBorrowedTab').classList.add('bg-blue-600', 'text-white');
+                document.getElementById('equipmentBorrowedTab').classList.remove('bg-gray-200', 'text-gray-700', 'hover:bg-gray-300');
+                document.getElementById('equipmentListView').classList.add('hidden');
+                document.getElementById('equipmentBorrowedView').classList.remove('hidden');
+                loadBorrowedEquipmentList();
+            }
+        }
+
+        function loadEquipmentList() {
+            db.collection('equipment').onSnapshot(snapshot => {
+                const equipmentList = document.getElementById('equipmentListView');
+                if (snapshot.empty) {
+                    equipmentList.innerHTML = '<p class="text-gray-600">ไม่มีอุปกรณ์</p>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const equipment = doc.data();
+                    const borrowed = equipment.total - equipment.available;
+                    const percentage = Math.round((equipment.available / equipment.total) * 100);
+                    const statusColor = percentage > 50 ? 'text-green-600' : percentage > 20 ? 'text-yellow-600' : 'text-red-600';
+                    
+                    html += `
+                        <div class="bg-white rounded-xl p-4 shadow-sm border">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold">${equipment.name}</h3>
+                                    <p class="text-gray-600">${equipment.description}</p>
+                                    <div class="mt-2">
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span>ทั้งหมด: ${equipment.total} ชิ้น</span>
+                                            <span class="${statusColor}">ว่าง: ${equipment.available} ชิ้น</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-blue-500 h-2 rounded-full" style="width: ${percentage}%"></div>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">กำลังถูกยืม: ${borrowed} ชิ้น</p>
+                                    </div>
+                                </div>
+                                <button onclick="deleteEquipment('${doc.id}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-all ml-4">ลบ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                equipmentList.innerHTML = html;
+            });
+        }
+
+        function loadBorrowedEquipmentList() {
+            db.collection('borrowedEquipment')
+                .where('returned', '==', false)
+                .orderBy('borrowedAt', 'desc')
+                .onSnapshot(snapshot => {
+                    const borrowedList = document.getElementById('equipmentBorrowedView');
+                    if (snapshot.empty) {
+                        borrowedList.innerHTML = '<p class="text-gray-600">ไม่มีอุปกรณ์ที่ถูกยืม</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const borrowed = doc.data();
+                        const borrowDate = borrowed.borrowedAt?.toDate();
+                        const daysBorrowed = borrowDate ? Math.floor((new Date() - borrowDate) / (1000 * 60 * 60 * 24)) : 0;
+                        const overdueClass = daysBorrowed > 7 ? 'border-red-500 bg-red-50' : daysBorrowed > 3 ? 'border-yellow-500 bg-yellow-50' : 'border-gray-200';
+                        
+                        html += `
+                            <div class="bg-white rounded-xl p-4 shadow-md border-2 ${overdueClass}">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold">${borrowed.equipmentName}</h3>
+                                        <p class="text-gray-600">ผู้ยืม: ${borrowed.borrowedByEmail}</p>
+                                        <p class="text-sm text-gray-500">ยืมเมื่อ: ${borrowDate ? borrowDate.toLocaleDateString('th-TH') : 'ไม่ทราบ'}</p>
+                                        <p class="text-sm ${daysBorrowed > 7 ? 'text-red-600' : daysBorrowed > 3 ? 'text-yellow-600' : 'text-gray-500'}">
+                                            ยืมมาแล้ว: ${daysBorrowed} วัน
+                                        </p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="forceReturnEquipment('${doc.id}')" class="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 transition-all text-sm">บังคับคืน</button>
+                                        <button onclick="contactBorrower('${borrowed.borrowedByEmail}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-all text-sm">ติดต่อ</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    borrowedList.innerHTML = html;
+                });
+        }
+
+        function loadUsersList() {
+            db.collection('users').where('approved', '==', true).onSnapshot(snapshot => {
+                const usersList = document.getElementById('usersList');
+                if (snapshot.empty) {
+                    usersList.innerHTML = '<p class="text-gray-600">ไม่มีผู้ใช้งาน</p>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    if (user.email !== 'sptmorral@spt.ac.th') { // Don't show admin in list
+                        html += `
+                            <div class="bg-white rounded-xl p-4 shadow-sm border">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h3 class="font-semibold">${user.name}</h3>
+                                        <p class="text-gray-600">${user.email}</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="resetUserPassword('${user.email}')" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-all">ส่งลิงก์รีเซ็ตรหัสผ่าน</button>
+                                        <button onclick="deleteUser('${doc.id}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-all">ลบบัญชี</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                usersList.innerHTML = html || '<p class="text-gray-600">ไม่มีผู้ใช้งาน</p>';
+            });
+        }
+
+        // Change Password Functions
+        function showChangePassword() {
+            document.getElementById('changePasswordModal').classList.remove('hidden');
+            // Clear form
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        }
+
+        function hideChangePassword() {
+            document.getElementById('changePasswordModal').classList.add('hidden');
+        }
+
+        async function changePassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showNotification('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร', 'warning');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showNotification('รหัสผ่านใหม่และการยืนยันไม่ตรงกัน', 'warning');
+                return;
+            }
+
+            try {
+                // Re-authenticate user with current password
+                const credential = firebase.auth.EmailAuthProvider.credential(
+                    currentUser.email,
+                    currentPassword
+                );
+                
+                await currentUser.reauthenticateWithCredential(credential);
+                
+                // Update password
+                await currentUser.updatePassword(newPassword);
+                
+                showNotification('แก้ไขรหัสผ่านสำเร็จ', 'success');
+                hideChangePassword();
+            } catch (error) {
+                if (error.code === 'auth/wrong-password') {
+                    showNotification('รหัสผ่านปัจจุบันไม่ถูกต้อง', 'error');
+                } else {
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // Delete Functions
+        async function deleteActivity(activityId) {
+            if (!isAdmin) {
+                showNotification('คุณไม่มีสิทธิ์ในการลบกิจกรรม', 'error');
+                return;
+            }
+            
+            if (confirm('ต้องการลบกิจกรรมนี้หรือไม่?')) {
+                try {
+                    await db.collection('activities').doc(activityId).delete();
+                    showNotification('ลบกิจกรรมสำเร็จ', 'success');
+                    // Reload all related data
+                    loadActivities();
+                    loadHomeData();
+                } catch (error) {
+                    console.error('Error deleting activity:', error);
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function deleteLineGroup(groupId) {
+            if (!isAdmin) {
+                showNotification('คุณไม่มีสิทธิ์ในการลบกลุ่มไลน์', 'error');
+                return;
+            }
+            
+            if (confirm('ต้องการลบกลุ่มไลน์นี้หรือไม่?')) {
+                try {
+                    await db.collection('linegroups').doc(groupId).delete();
+                    showNotification('ลบกลุ่มไลน์สำเร็จ', 'success');
+                    // Reload all related data
+                    loadLineGroups();
+                    loadHomeData();
+                } catch (error) {
+                    console.error('Error deleting line group:', error);
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function deleteCalendarEvent(eventId) {
+            if (!isAdmin) {
+                showNotification('คุณไม่มีสิทธิ์ในการลบกิจกรรมในปฏิทิน', 'error');
+                return;
+            }
+            
+            if (confirm('ต้องการลบกิจกรรมในปฏิทินนี้หรือไม่?')) {
+                try {
+                    await db.collection('calendarEvents').doc(eventId).delete();
+                    showNotification('ลบกิจกรรมในปฏิทินสำเร็จ', 'success');
+                    // Reload all related data
+                    loadCalendarEvents();
+                    loadHomeData();
+                } catch (error) {
+                    console.error('Error deleting calendar event:', error);
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function deleteEquipment(equipmentId) {
+            if (!isAdmin) {
+                showNotification('คุณไม่มีสิทธิ์ในการลบอุปกรณ์', 'error');
+                return;
+            }
+            
+            if (confirm('ต้องการลบอุปกรณ์นี้หรือไม่? การกระทำนี้จะลบประวัติการยืมทั้งหมดของอุปกรณ์นี้ด้วย')) {
+                try {
+                    // First check if equipment is currently borrowed
+                    const borrowedSnapshot = await db.collection('borrowedEquipment')
+                        .where('equipmentId', '==', equipmentId)
+                        .where('returned', '==', false)
+                        .get();
+                    
+                    if (!borrowedSnapshot.empty) {
+                        showNotification('ไม่สามารถลบอุปกรณ์ที่กำลังถูกยืมได้ กรุณาให้ผู้ยืมคืนก่อน', 'warning');
+                        return;
+                    }
+
+                    const batch = db.batch();
+                    
+                    // Delete equipment document
+                    const equipmentRef = db.collection('equipment').doc(equipmentId);
+                    batch.delete(equipmentRef);
+                    
+                    // Delete all borrowed equipment records for this equipment (only returned ones)
+                    const allBorrowedSnapshot = await db.collection('borrowedEquipment').where('equipmentId', '==', equipmentId).get();
+                    allBorrowedSnapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    // Delete all borrow requests for this equipment
+                    const requestsSnapshot = await db.collection('borrowRequests').where('equipmentId', '==', equipmentId).get();
+                    requestsSnapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    await batch.commit();
+                    showNotification('ลบอุปกรณ์และข้อมูลที่เกี่ยวข้องสำเร็จ', 'success');
+                    // Reload all related data
+                    loadEquipmentList();
+                    loadEquipment();
+                    loadHomeData();
+                } catch (error) {
+                    console.error('Error deleting equipment:', error);
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function resetUserPassword(email) {
+            if (confirm('ต้องการส่งลิงก์รีเซ็ตรหัสผ่านให้ผู้ใช้นี้หรือไม่?')) {
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    showNotification('ส่งอีเมลรีเซ็ตรหัสผ่านสำเร็จ', 'success');
+                } catch (error) {
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (confirm('ต้องการลบบัญชีผู้ใช้นี้หรือไม่? การกระทำนี้ไม่สามารถยกเลิกได้')) {
+                try {
+                    // Delete user document from Firestore
+                    await db.collection('users').doc(userId).delete();
+                    
+                    // Also delete related data
+                    const batch = db.batch();
+                    
+                    // Delete user's activities
+                    const activitiesSnapshot = await db.collection('activities').where('submittedBy', '==', userId).get();
+                    activitiesSnapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    // Delete user's calendar events
+                    const eventsSnapshot = await db.collection('calendarEvents').where('submittedBy', '==', userId).get();
+                    eventsSnapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    // Delete user's borrow requests
+                    const borrowRequestsSnapshot = await db.collection('borrowRequests').where('requestedBy', '==', userId).get();
+                    borrowRequestsSnapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    
+                    // Update borrowed equipment to mark as force returned if user still has borrowed items
+                    const borrowedSnapshot = await db.collection('borrowedEquipment').where('borrowedBy', '==', userId).where('returned', '==', false).get();
+                    borrowedSnapshot.forEach(doc => {
+                        batch.update(doc.ref, {
+                            returned: true,
+                            returnedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            forceReturned: true,
+                            forceReturnedBy: currentUser.email,
+                            note: 'บัญชีผู้ใช้ถูกลบ'
+                        });
+                        
+                        // Also need to update equipment availability
+                        const borrowedData = doc.data();
+                        if (borrowedData.equipmentId) {
+                            const equipmentRef = db.collection('equipment').doc(borrowedData.equipmentId);
+                            batch.update(equipmentRef, {
+                                available: firebase.firestore.FieldValue.increment(1)
+                            });
+                        }
+                    });
+                    
+                    await batch.commit();
+                    showNotification('ลบบัญชีผู้ใช้และข้อมูลที่เกี่ยวข้องสำเร็จ', 'success');
+                } catch (error) {
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // Initialize Admin Account
+        async function initializeAdminAccount() {
+            try {
+                // Check if admin account exists
+                const adminQuery = await db.collection('users').where('email', '==', 'sptmorral@spt.ac.th').get();
+                
+                if (adminQuery.empty) {
+                    // Create admin account
+                    const adminCredential = await auth.createUserWithEmailAndPassword('sptmorral@spt.ac.th', 'SPTMoralSchool');
+                    const adminUser = adminCredential.user;
+                    
+                    // Add admin to users collection
+                    await db.collection('users').doc(adminUser.uid).set({
+                        name: 'ผู้ดูแลระบบ',
+                        email: 'sptmorral@spt.ac.th',
+                        approved: true,
+                        isAdmin: true,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    console.log('Admin account created successfully');
+                    await auth.signOut(); // Sign out after creating admin account
+                }
+            } catch (error) {
+                console.log('Admin account already exists or error:', error.message);
+            }
+        }
+
+        // Initialize
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // Check if user is approved
+                db.collection('users').doc(user.uid).get().then(doc => {
+                    if (doc.exists && doc.data().approved) {
+                        currentUser = user;
+                        isAdmin = user.email === 'sptmorral@spt.ac.th';
+                        showMainApp();
+                    } else {
+                        auth.signOut();
+                    }
+                });
+            }
+        });
+
+        // Borrow History Functions
+        function showBorrowHistory() {
+            document.getElementById('borrowHistoryModal').classList.remove('hidden');
+            loadBorrowHistory();
+        }
+
+        function hideBorrowHistory() {
+            document.getElementById('borrowHistoryModal').classList.add('hidden');
+        }
+
+        function loadBorrowHistory() {
+            const filter = document.getElementById('historyFilter').value;
+            const search = document.getElementById('searchHistory').value.toLowerCase();
+            const historyList = document.getElementById('borrowHistoryList');
+
+            let query = db.collection('borrowedEquipment').orderBy('borrowedAt', 'desc');
+
+            if (filter === 'borrowed') {
+                query = query.where('returned', '==', false);
+            } else if (filter === 'returned') {
+                query = query.where('returned', '==', true);
+            }
+
+            query.onSnapshot(snapshot => {
+                if (snapshot.empty) {
+                    historyList.innerHTML = '<p class="text-gray-600">ไม่มีประวัติการยืม</p>';
+                    return;
+                }
+
+                let html = '';
+                snapshot.forEach(doc => {
+                    const record = doc.data();
+                    const borrowDate = record.borrowedAt?.toDate();
+                    const returnDate = record.returnedAt?.toDate();
+                    
+                    // Apply search filter
+                    if (search && !record.equipmentName.toLowerCase().includes(search) && 
+                        !record.borrowedByEmail.toLowerCase().includes(search)) {
+                        return;
+                    }
+
+                    const daysBorrowed = borrowDate && returnDate ? 
+                        Math.floor((returnDate - borrowDate) / (1000 * 60 * 60 * 24)) :
+                        borrowDate ? Math.floor((new Date() - borrowDate) / (1000 * 60 * 60 * 24)) : 0;
+
+                    const statusClass = record.returned ? 'border-green-500 bg-green-50' : 
+                        daysBorrowed > 7 ? 'border-red-500 bg-red-50' : 
+                        daysBorrowed > 3 ? 'border-yellow-500 bg-yellow-50' : 'border-blue-500 bg-blue-50';
+
+                    const statusText = record.returned ? 'คืนแล้ว' : 
+                        daysBorrowed > 7 ? 'เกินกำหนด' : 
+                        daysBorrowed > 3 ? 'ใกล้เกินกำหนด' : 'กำลังยืม';
+
+                    html += `
+                        <div class="bg-white rounded-xl p-4 shadow-md border-2 ${statusClass}">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <h3 class="font-semibold">${record.equipmentName}</h3>
+                                        <span class="px-2 py-1 rounded-full text-xs font-medium ${
+                                            record.returned ? 'bg-green-100 text-green-800' : 
+                                            daysBorrowed > 7 ? 'bg-red-100 text-red-800' : 
+                                            daysBorrowed > 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'
+                                        }">${statusText}</span>
+                                    </div>
+                                    <p class="text-gray-600">ผู้ยืม: ${record.borrowedByEmail}</p>
+                                    <p class="text-sm text-gray-500">ยืมเมื่อ: ${borrowDate ? borrowDate.toLocaleDateString('th-TH') + ' ' + borrowDate.toLocaleTimeString('th-TH', {hour: '2-digit', minute: '2-digit'}) : 'ไม่ทราบ'}</p>
+                                    ${record.returned ? 
+                                        `<p class="text-sm text-gray-500">คืนเมื่อ: ${returnDate ? returnDate.toLocaleDateString('th-TH') + ' ' + returnDate.toLocaleTimeString('th-TH', {hour: '2-digit', minute: '2-digit'}) : 'ไม่ทราบ'}</p>
+                                         <p class="text-sm text-gray-500">ระยะเวลาที่ยืม: ${daysBorrowed} วัน</p>` :
+                                        `<p class="text-sm ${daysBorrowed > 7 ? 'text-red-600' : daysBorrowed > 3 ? 'text-yellow-600' : 'text-gray-500'}">
+                                            ยืมมาแล้ว: ${daysBorrowed} วัน
+                                        </p>`
+                                    }
+                                </div>
+                                <div class="flex gap-2">
+                                    ${!record.returned ? 
+                                        `<button onclick="forceReturnEquipment('${doc.id}')" class="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 transition-all text-sm">บังคับคืน</button>
+                                         <button onclick="contactBorrower('${record.borrowedByEmail}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-all text-sm">ติดต่อ</button>` :
+                                        `<button onclick="deleteBorrowRecord('${doc.id}')" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-all text-sm">ลบประวัติ</button>`
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                if (html === '') {
+                    historyList.innerHTML = '<p class="text-gray-600">ไม่พบข้อมูลที่ค้นหา</p>';
+                } else {
+                    historyList.innerHTML = html;
+                }
+            });
+        }
+
+        async function forceReturnEquipment(borrowedId) {
+            if (confirm('ต้องการบังคับคืนอุปกรณ์นี้หรือไม่?')) {
+                try {
+                    const borrowedDoc = await db.collection('borrowedEquipment').doc(borrowedId).get();
+                    if (!borrowedDoc.exists) {
+                        showNotification('ไม่พบข้อมูลการยืม', 'error');
+                        return;
+                    }
+                    
+                    const borrowed = borrowedDoc.data();
+
+                    // Use batch to ensure both operations succeed or fail together
+                    const batch = db.batch();
+
+                    // Update borrowed equipment record
+                    const borrowedRef = db.collection('borrowedEquipment').doc(borrowedId);
+                    batch.update(borrowedRef, {
+                        returned: true,
+                        returnedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        forceReturned: true,
+                        forceReturnedBy: currentUser.email
+                    });
+
+                    // Update equipment availability
+                    const equipmentRef = db.collection('equipment').doc(borrowed.equipmentId);
+                    batch.update(equipmentRef, {
+                        available: firebase.firestore.FieldValue.increment(1)
+                    });
+
+                    await batch.commit();
+                    showNotification('บังคับคืนอุปกรณ์สำเร็จ', 'success');
+                } catch (error) {
+                    console.error('Error force returning equipment:', error);
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        function contactBorrower(email) {
+            const subject = encodeURIComponent('เรื่อง: การคืนอุปกรณ์');
+            const body = encodeURIComponent('เรียน คุณ ' + email + '\n\nกรุณาคืนอุปกรณ์ที่ยืมไปให้เรียบร้อย\n\nขอบคุณครับ/ค่ะ\nคณะกรรมการนักเรียน');
+            window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+        }
+
+        async function deleteBorrowRecord(recordId) {
+            if (confirm('ต้องการลบประวัติการยืมนี้หรือไม่?')) {
+                try {
+                    await db.collection('borrowedEquipment').doc(recordId).delete();
+                    showNotification('ลบประวัติการยืมสำเร็จ', 'success');
+                    // Reload borrow history
+                    loadBorrowHistory();
+                } catch (error) {
+                    console.error('Error deleting borrow record:', error);
+                    showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // Update loadAdminData to include equipment tabs
+        function loadAdminData() {
+            loadPendingApprovals();
+            loadUsersList();
+            showEquipmentTab('list'); // Load equipment list by default
+        }
+
+        // Initialize admin account on page load
+        window.addEventListener('load', () => {
+            initializeAdminAccount();
+            loadCalendar();
+        });
+
+        // Load initial calendar
+        loadCalendar();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98c32cf1c671731f',t:'MTc2MDA2ODQ1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
