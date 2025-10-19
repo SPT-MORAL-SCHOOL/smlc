@@ -236,11 +236,11 @@
                     <!-- Recent Line Groups -->
                     <div class="glass-effect rounded-2xl p-6 hover-lift">
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-bold text-gray-800">กลุ่มไลน์ล่าสุด</h2>
+                            <h2 class="text-xl font-bold text-gray-800">ลิงก์ล่าสุด</h2>
                             <button onclick="showPage('linegroups')" class="text-green-600 hover:text-green-800 text-sm">ดูทั้งหมด →</button>
                         </div>
                         <div id="recentLineGroups" class="space-y-3">
-                            <p class="text-gray-600">ไม่มีกลุ่มไลน์</p>
+                            <p class="text-gray-600">ไม่มีลิงก์</p>
                         </div>
                     </div>
 
@@ -268,16 +268,16 @@
                     <div id="addActivityForm" class="hidden mb-6 p-4 bg-blue-50 rounded-xl">
                         <h3 class="font-semibold mb-4">เพิ่มกิจกรรมใหม่</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label for="activityName" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">ชื่อกิจกรรม</label>
+                            <label for="activityName" class="block text-sm font-medium text-gray-700 mb-2">ชื่อกิจกรรม</label>
                             <input type="text" id="activityName" placeholder="ชื่อกิจกรรม" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <label for="activityDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">วันที่กิจกรรม</label>
+                            <label for="activityDate" class="block text-sm font-medium text-gray-700 mb-2">วันที่กิจกรรม</label>
                             <input type="date" id="activityDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <label for="activityTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">เวลากิจกรรม</label>
+                            <label for="activityTime" class="block text-sm font-medium text-gray-700 mb-2">เวลากิจกรรม</label>
                             <input type="time" id="activityTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <label for="activityLocation" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">สถานที่กิจกรรม</label>
+                            <label for="activityLocation" class="block text-sm font-medium text-gray-700 mb-2">สถานที่กิจกรรม</label>
                             <input type="text" id="activityLocation" placeholder="สถานที่" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
-                        <label for="activityDetails" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">รายละเอียดกิจกรรม</label>
+                        <label for="activityDetails" class="block text-sm font-medium text-gray-700 mb-2">รายละเอียดกิจกรรม</label>
                         <textarea id="activityDetails" placeholder="รายละเอียดกิจกรรม" class="w-full mt-4 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500" rows="3"></textarea>
                         <div class="flex gap-2 mt-4">
                             <button onclick="submitActivity()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">ส่งคำขอ</button>
@@ -302,13 +302,13 @@
                     <div id="addLineGroupForm" class="hidden mb-6 p-4 bg-green-50 rounded-xl">
                         <h3 class="font-semibold mb-4">เพิ่มลิงก์ใหม่</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label for="lineGroupName" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">ชื่อลิงก์</label>
+                            <label for="lineGroupName" class="block text-sm font-medium text-gray-700 mb-2">ชื่อลิงก์</label>
                             <input type="text" id="lineGroupName" placeholder="ชื่อลิงก์" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <label for="lineGroupLink" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">ลิงก์</label>
+                            <label for="lineGroupLink" class="block text-sm font-medium text-gray-700 mb-2">ลิงก์</label>
                             <input type="url" id="lineGroupLink" placeholder="ลิงก์" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                         <div class="flex gap-2 mt-4">
-                            <button onclick="addLineGroup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">เพิ่มลิงก์</button>
+                            <button onclick="addLineGroup()" class="block text-sm font-medium text-gray-700 mb-2">เพิ่มลิงก์</button>
                             <button onclick="hideAddLineGroup()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">ยกเลิก</button>
                         </div>
                     </div>
@@ -351,26 +351,26 @@
                     <div id="addEventForm" class="hidden mb-6 p-4 bg-purple-50 rounded-xl">
                         <h3 class="font-semibold mb-4">เพิ่มกิจกรรมในปฏิทิน</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <label for="eventTitle" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">ชื่อกิจกรรม</label>
+                            <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-2">ชื่อกิจกรรม</label>
                             <input type="text" id="eventTitle" placeholder="ชื่อกิจกรรม" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
-                            <label for="eventType" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">ประเภทกิจกรรม</label>
+                            <label for="eventType" class="block text-sm font-medium text-gray-700 mb-2">ประเภทกิจกรรม</label>
                             <select id="eventType" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
                                 <option value="">เลือกประเภท</option>
                                 <option value="ประชุม">ประชุม</option>
                                 <option value="กิจกรรม">กิจกรรม</option>
                             </select>
-                            <label for="eventStartDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">วันที่เริ่ม</label>
+                            <label for="eventStartDate" class="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่ม</label>
                             <input type="date" id="eventStartDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
-                            <label for="eventEndDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">วันที่สิ้นสุด</label>
+                            <label for="eventEndDate" class="block text-sm font-medium text-gray-700 mb-2">วันที่สิ้นสุด</label>
                             <input type="date" id="eventEndDate" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
-                            <label for="eventStartTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">เวลาที่เริ่ม</label>
+                            <label for="eventStartTime" class="block text-sm font-medium text-gray-700 mb-2">เวลาที่เริ่ม</label>
                             <input type="time" id="eventStartTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
-                            <label for="eventEndTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">เวลาที่สิ้นสุด</label>
+                            <label for="eventEndTime" class="block text-sm font-medium text-gray-700 mb-2">เวลาที่สิ้นสุด</label>
                             <input type="time" id="eventEndTime" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">
-                            <label for="eventLocation" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">สถานที่</label>
+                            <label for="eventLocation" class="block text-sm font-medium text-gray-700 mb-2">สถานที่</label>
                             <input type="text" id="eventLocation" placeholder="สถานที่" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500 md:col-span-2">
                         </div>
-                        <label for="eventDetails" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">รายละเอียด</label>
+                        <label for="eventDetails" class="block text-sm font-medium text-gray-700 mb-2">รายละเอียด</label>
                         <textarea id="eventDetails" placeholder="รายละเอียด" class="w-full mt-4 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3"></textarea>
                         <div class="flex gap-2 mt-4">
                             <button onclick="submitEvent()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-all">ส่งคำขอ</button>
@@ -408,12 +408,12 @@
                         <div id="addEquipmentForm" class="hidden mb-6 p-4 bg-blue-50 rounded-xl">
                             <h3 class="font-semibold mb-4">เพิ่มอุปกรณ์ใหม่</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <label for="equipmentName" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">ชื่ออุปกรณ์</label>
+                                <label for="equipmentName" class="block text-sm font-medium text-gray-700 mb-2">ชื่ออุปกรณ์</label>
                                 <input type="text" id="equipmentName" placeholder="ชื่ออุปกรณ์" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <label for="equipmentQuantity" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">จำนวนอึปกรณ์</label>
+                                <label for="equipmentQuantity" class="block text-sm font-medium text-gray-700 mb-2"">จำนวนอึปกรณ์</label>
                                 <input type="number" id="equipmentQuantity" placeholder="จำนวน" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
-                            <label for="equipmentDescription" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-purple-500">รายละเอียด</label>
+                            <label for="equipmentDescription" class="block text-sm font-medium text-gray-700 mb-2">รายละเอียด</label>
                             <textarea id="equipmentDescription" placeholder="รายละเอียด" class="w-full mt-4 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500" rows="2"></textarea>
                             <div class="flex gap-2 mt-4">
                                 <button onclick="addEquipment()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">เพิ่มอุปกรณ์</button>
