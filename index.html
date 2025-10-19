@@ -818,7 +818,7 @@
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <h4 class="font-medium text-sm">${group.name}</h4>
-                                        <a href="${group.link}" target="_blank" class="text-xs text-green-600 hover:text-green-800">เข้าชมลิงก์</a>
+                                        <a href="${group.link}" target="_blank" class="text-xs text-green-600 hover:text-green-800">เข้าชมลิงก์ →</a>
                                     </div>
                                     ${isAdmin ? `<button onclick="deleteLineGroup('${doc.id}')" class="text-red-500 hover:text-red-700 text-xs ml-2">ลบ</button>` : ''}
                                 </div>
@@ -1073,7 +1073,7 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                showNotification('เพิ่มกลุ่มไลน์สำเร็จ', 'success');
+                showNotification('เพิ่มลิงก์สำเร็จ', 'success');
                 hideAddLineGroup();
             } catch (error) {
                 showNotification('เกิดข้อผิดพลาด: ' + error.message, 'error');
@@ -1087,7 +1087,7 @@
                 .orderBy('createdAt', 'desc')
                 .onSnapshot(snapshot => {
                     if (snapshot.empty) {
-                        lineGroupsList.innerHTML = '<p class="text-gray-600">ยังไม่มีกลุ่มไลน์</p>';
+                        lineGroupsList.innerHTML = '<p class="text-gray-600">ยังไม่มีลิงก์</p>';
                         return;
                     }
 
@@ -1098,7 +1098,7 @@
                             <div class="bg-white rounded-xl p-4 shadow-sm border hover-lift">
                                 <h3 class="font-semibold text-lg mb-2">${group.name}</h3>
                                 <div class="flex gap-2">
-                                    <a href="${group.link}" target="_blank" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all inline-block">เข้าร่วมกลุ่ม</a>
+                                    <a href="${group.link}" target="_blank" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-all inline-block">เข้าชมลิงก์</a>
                                     ${isAdmin ? `<button onclick="deleteLineGroup('${doc.id}')" class="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-all">ลบ</button>` : ''}
                                 </div>
                             </div>
