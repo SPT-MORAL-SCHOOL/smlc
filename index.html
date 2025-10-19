@@ -806,7 +806,7 @@
                 .limit(3)
                 .onSnapshot(snapshot => {
                     if (snapshot.empty) {
-                        recentLineGroups.innerHTML = '<p class="text-gray-600">ไม่มีกลุ่มไลน์</p>';
+                        recentLineGroups.innerHTML = '<p class="text-gray-600">ไม่มีลิงก์</p>';
                         return;
                     }
 
@@ -818,7 +818,7 @@
                                 <div class="flex justify-between items-start">
                                     <div class="flex-1">
                                         <h4 class="font-medium text-sm">${group.name}</h4>
-                                        <a href="${group.link}" target="_blank" class="text-xs text-green-600 hover:text-green-800">เข้าร่วมกลุ่ม →</a>
+                                        <a href="${group.link}" target="_blank" class="text-xs text-green-600 hover:text-green-800">เข้าชมลิงก์</a>
                                     </div>
                                     ${isAdmin ? `<button onclick="deleteLineGroup('${doc.id}')" class="text-red-500 hover:text-red-700 text-xs ml-2">ลบ</button>` : ''}
                                 </div>
