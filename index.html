@@ -95,7 +95,7 @@
                 <div class="flex justify-between items-center py-4">
                     <div class="flex items-center space-x-3">
                         <img src="https://img5.pic.in.th/file/secure-sv1/IMG_25650953161d1c1bbdd8.jpeg" alt="โลโก้โรงเรียน" class="w-10 h-10 rounded-full">
-                        <h1 class="text-xl font-bold text-gray-800">SPT MORAL SCHOOL</h1>
+                        <h1 class="text-xl font-bold text-gray-800">โรงเรียนคุณธรรม สพฐ. โรงเรียนสตรีพัทลุง</h1>
                     </div>
                     <div class="flex items-center space-x-4">
                         <span id="userInfo" class="text-gray-600"></span>
@@ -112,7 +112,7 @@
                 <div class="flex flex-wrap gap-2">
                     <button onclick="showPage('home')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="home">หน้าหลัก</button>
                     <button onclick="showPage('activities')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="activities">กิจกรรม</button>
-                    <button onclick="showPage('linegroups')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="linegroups">กลุ่มไลน์</button>
+                    <button onclick="showPage('linegroups')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="linegroups">ลิงก์</button>
                     <button onclick="showPage('equipment')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="equipment">ยืม-คืนอุปกรณ์</button>
                     <button onclick="showPage('calendar')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift" data-page="calendar">ปฏิทิน</button>
                     <button id="adminBtn" onclick="showPage('admin')" class="nav-btn px-4 py-2 rounded-xl transition-all hover-lift hidden" data-page="admin">จัดการระบบ</button>
@@ -142,7 +142,7 @@
                     <div class="glass-effect rounded-xl p-4 hover-lift">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm text-gray-600">กลุ่มไลน์</p>
+                                <p class="text-sm text-gray-600">ลิงก์</p>
                                 <p class="text-2xl font-bold text-green-600" id="totalLineGroups">0</p>
                             </div>
                             <div class="bg-green-100 p-3 rounded-full">
@@ -236,11 +236,11 @@
                     <!-- Recent Line Groups -->
                     <div class="glass-effect rounded-2xl p-6 hover-lift">
                         <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-bold text-gray-800">กลุ่มไลน์ล่าสุด</h2>
+                            <h2 class="text-xl font-bold text-gray-800">ลิงก์ล่าสุด</h2>
                             <button onclick="showPage('linegroups')" class="text-green-600 hover:text-green-800 text-sm">ดูทั้งหมด →</button>
                         </div>
                         <div id="recentLineGroups" class="space-y-3">
-                            <p class="text-gray-600">ไม่มีกลุ่มไลน์</p>
+                            <p class="text-gray-600">ไม่มีลิงก์</p>
                         </div>
                     </div>
 
@@ -290,24 +290,24 @@
             <div id="linegroupsPage" class="page hidden">
                 <div class="glass-effect rounded-2xl p-6 hover-lift">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-800">กลุ่มไลน์</h2>
-                        <button id="addLineGroupBtn" onclick="showAddLineGroup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all hover-lift hidden">เพิ่มกลุ่มไลน์</button>
+                        <h2 class="text-xl font-bold text-gray-800">ลิงก์</h2>
+                        <button id="addLineGroupBtn" onclick="showAddLineGroup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all hover-lift hidden">เพิ่มลิงก์</button>
                     </div>
 
                     <div id="addLineGroupForm" class="hidden mb-6 p-4 bg-green-50 rounded-xl">
-                        <h3 class="font-semibold mb-4">เพิ่มกลุ่มไลน์ใหม่</h3>
+                        <h3 class="font-semibold mb-4">เพิ่มลิงก์ใหม่</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" id="lineGroupName" placeholder="ชื่อกลุ่ม" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <input type="url" id="lineGroupLink" placeholder="ลิงก์กลุ่มไลน์" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <input type="text" id="lineGroupName" placeholder="ชื่อลิงก์" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <input type="url" id="lineGroupLink" placeholder="ลิงก์" class="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500">
                         </div>
                         <div class="flex gap-2 mt-4">
-                            <button onclick="addLineGroup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">เพิ่มกลุ่ม</button>
+                            <button onclick="addLineGroup()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all">เพิ่มลิงก์</button>
                             <button onclick="hideAddLineGroup()" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all">ยกเลิก</button>
                         </div>
                     </div>
 
                     <div id="lineGroupsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <p class="text-gray-600">ยังไม่มีกลุ่มไลน์</p>
+                        <p class="text-gray-600">ยังไม่มีลิงก์</p>
                     </div>
                 </div>
             </div>
