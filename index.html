@@ -882,33 +882,103 @@
                 });
         }
 
-        function loadCalendar() {
-            const now = new Date();
-            const monthNames = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-                              'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-            
-            document.getElementById('currentMonth').textContent = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+        let currentDate = new Date();
 
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            const startDate = firstDay.getDay();
+function loadCalendar() {
+    const calendarGrid = document.getElementById('calendarGrid');
+    const monthYearDisplay = document.getElementById('currentMonthYear');
+    
+    // ตรวจสอบว่ามี element ปฏิทินอยู่จริงหรือไม่ (กัน Error)
+    if (!calendarGrid || !monthYearDisplay) return;
 
-            let daysHTML = '';
-            
-            // Empty cells for days before month starts
-            for (let i = 0; i < startDate; i++) {
-                daysHTML += '<div class="p-2"></div>';
+    // เคลียร์ปฏิทินเก่า (เก็บ Header วันในสัปดาห์ไว้ 7 อันแรก)
+    while (calendarGrid.children.length > 7) {
+        calendarGrid.removeChild(calendarGrid.lastChild);
+    }
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    
+    // แสดงชื่อเดือนและปีภาษาไทย
+    const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+    monthYearDisplay.innerText = `${thaiMonths[month]} ${year + 543}`;
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDay = firstDay.getDay(); // 0 = Sunday
+
+    // สร้างช่องว่างสำหรับวันก่อนวันที่ 1
+    for (let i = 0; i < startingDay; i++) {
+        const blank = document.createElement('div');
+        blank.className = 'p-2';
+        calendarGrid.appendChild(blank);
+    }
+
+    // ดึงข้อมูลการจอง "ทั้งหมด" ที่ "อนุมัติแล้ว" จาก Firestore
+    // หมายเหตุ: ไม่ต้องใส่เงื่อนไข userId เพื่อให้ทุกคนเห็นเหมือนกัน
+    db.collection('bookings')
+        .where('status', '==', 'approved') 
+        .get()
+        .then((snapshot) => {
+            let approvedBookings = [];
+            snapshot.forEach(doc => {
+                approvedBookings.push({ id: doc.id, ...doc.data() });
+            });
+
+            // วาดวันที่
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'border rounded p-2 min-h-[80px] bg-gray-50 relative hover:bg-blue-50 transition';
+                
+                // เลขวันที่
+                const dateNum = document.createElement('div');
+                dateNum.className = 'font-semibold text-right text-gray-700';
+                dateNum.innerText = i;
+                dayCell.appendChild(dateNum);
+
+                // เช็คว่าเป็นวันปัจจุบันหรือไม่
+                const today = new Date();
+                if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    dayCell.classList.add('border-blue-500', 'bg-blue-50');
+                    dateNum.classList.add('text-blue-600');
+                }
+
+                // หาการจองในวันนี้
+                const currentDayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                
+                const daysEvents = approvedBookings.filter(booking => booking.date === currentDayStr);
+
+                daysEvents.forEach(event => {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'text-xs p-1 mt-1 rounded text-white truncate cursor-pointer';
+                    
+                    // แยกสีตามประเภท (ตัวอย่าง)
+                    if (event.type === 'room') {
+                        eventDiv.classList.add('bg-green-500'); // ห้องประชุม
+                    } else {
+                        eventDiv.classList.add('bg-orange-500'); // อุปกรณ์
+                    }
+                    
+                    eventDiv.innerText = `${event.startTime} น. - ${event.room || event.item}`;
+                    eventDiv.title = `ผู้จอง: ${event.userName || 'ไม่ระบุ'}\nรายละเอียด: ${event.purpose}`;
+                    
+                    dayCell.appendChild(eventDiv);
+                });
+
+                calendarGrid.appendChild(dayCell);
             }
+        })
+        .catch((error) => {
+            console.error("Error loading calendar:", error);
+        });
+}
 
-            // Days of the month
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const isToday = day === now.getDate();
-                const dayClass = isToday ? 'bg-blue-600 text-white' : 'hover:bg-gray-100';
-                daysHTML += `<div class="p-2 rounded cursor-pointer ${dayClass}">${day}</div>`;
-            }
+function changeMonth(offset) {
+    currentDate.setMonth(currentDate.getMonth() + offset);
+    loadCalendar();
+}
 
-            document.getElementById('calendarDays').innerHTML = daysHTML;
-        }
 
         function loadEquipmentStatus() {
             const equipmentStatus = document.getElementById('equipmentStatus');
